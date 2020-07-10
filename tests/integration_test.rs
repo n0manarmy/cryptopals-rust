@@ -1,4 +1,7 @@
-
+#[test]
+pub fn ch6() {
+    
+}
 
 #[test]
 pub fn scratch() {

@@ -1,5 +1,10 @@
 use std::collections::BTreeMap;
 
+pub fn hamming_distance(buf1: Vec<char>, buf2: Vec<char>) -> usize {
+
+    0
+}
+
 pub fn ascii_scoring(buf: &Vec<char>) -> (f32, BTreeMap<String, f32>) {
     let mut ascii_map: BTreeMap<String, f32> = BTreeMap::new();
     for b in buf {
@@ -212,4 +217,15 @@ mod tests {
         let val = vec!['¾'];
         assert_eq!(garbage_found(&val), true);
     }
+
+    #[test]
+    pub fn test_hamming_distance() {
+        let val1_str = "this is a test";
+        let val2_str = "wokka wokka!!!";
+        let val1_buf: Vec<char> = val1_str.chars().collect();
+        let val2_buf: Vec<char> = val2_str.chars().collect();
+
+        assert_eq!(hamming_distance(val1_buf, val2_buf), 0);
+    }
+
 }
