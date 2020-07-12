@@ -1,51 +1,55 @@
-use super::*;
+use crate::utils::translators;
 
-pub fn str_to_hex_val(buf: String) -> Vec<u32> {
-    let mut hex_buf: Vec<u32> = Vec::new();
-    
-    let mut hex_merge: u32 = 0;
-    let mut pos = 1;
-    
-    for c in buf.chars() {
-        hex_merge |= c.to_digit(16).unwrap();
 
-        if pos == 2 {
-            hex_buf.push(hex_merge);
-            hex_merge = 0;
-            pos = 1;
+fn decode_str(val: &str) -> String {
+    let mut decoded: String = String::new();
+    let mut byte_buf: u32 = 0;
+    let mut buf_size = 0;
+
+    for c in val.chars() {
+        buf_size += 1;
+        if c == '=' {
             continue;
+        } else {
+            dbg!(c);
+            byte_buf |= translators::from_base64(c) as u32;
+            println!("byte_buf: {:b}", byte_buf);
+            if buf_size == 4 {
+                let bytes = decode_match(byte_buf, buf_size);
+                println!("inside: {:b}", bytes);
+                buf_size = 0;
+            }
+            byte_buf <<= 6;
         }
-
-        pos += 1;
-        hex_merge <<= 4;
     }
-    
-    hex_buf
+
+    if buf_size != 0 {
+        let bytes = decode_match(byte_buf, buf_size);
+        println!("outside: {:b}", bytes);
+    }
+
+    decoded
 }
 
-pub fn xor_same_size_buffers(buf1: Vec<u32>, buf2: Vec<u32>) -> Vec<u32> {
-    let mut xor_results: Vec<u32> = Vec::new();
+
+fn decode_match(byte_buf: u32, mut buf_size: u8) -> u32 {
+    let mut str_buff: u32 = 0;
     let mut pos = 0;
-    if buf1.len() != buf2.len() {
-        panic!("buffers are not equal length");
-    };
+    let mut byte: u32 = 0;
+    while buf_size > 0 {
+        match buf_size {
+            4 => byte = byte_buf & 0xFC0000,
+            3 => byte = byte_buf & 0x3F000,
+            2 => byte = byte_buf & 0xFC0,
+            1 => byte = byte_buf & 0x3F,
+            _ => panic!("Error in decode_match, unknown value found"),
+        }
+        buf_size -= 1;
+        str_buff <<= 6;
+        str_buff = str_buff ^ byte;
 
-    while pos < buf1.len() {
-        xor_results.push(buf1[pos] ^ buf2[pos]);
-        pos += 1;
     }
-
-    xor_results
-
-}
-
-pub fn xor_buf_against_value(buf: &Vec<u32>, val: u32) -> Vec<u32> {
-    let mut xor_results: Vec<u32> = Vec::new();
-    for b in buf {
-        xor_results.push(b ^ val)
-    }
-
-    xor_results
+    str_buff
 }
 
 #[cfg(test)]
@@ -98,5 +102,37 @@ mod tests {
             println!();
         }
     }
+    
 
+    #[test]
+    pub fn test_run_2() {
+        let test_val = ("s", "cw==");
+        dbg!(test_val);
+        assert_eq!(decode_str(test_val.1),test_val.0);
+        let test_val = ("Ma", "TWE=");
+        dbg!(test_val);
+        assert_eq!(decode_str(test_val.1),test_val.0);
+        let test_val = ("Man", "TWFu");
+        dbg!(test_val);
+        assert_eq!(decode_str(test_val.1),test_val.0);
+        let test_val = ("Man is", "TWFuIGlz");
+        dbg!(test_val);
+        assert_eq!(decode_str(test_val.1),test_val.0);
+        let test_val = ("Man is d", "TWFuIGlzIGQ=");
+        dbg!(test_val);
+        assert_eq!(decode_str(test_val.1),test_val.0);
+        let test_val = ("Man is di", "TWFuIGlzIGRp");
+        dbg!(test_val);
+        assert_eq!(decode_str(test_val.1),test_val.0);
+        let test_val = ("Man is dis", "TWFuIGlzIGRpcw==");
+        dbg!(test_val);
+        assert_eq!(decode_str(test_val.1),test_val.0);
+    }
+
+    #[test]
+    pub fn test_decode() {
+        let test_val = ("s", "cw==");
+        dbg!(test_val);
+        assert_eq!(decode_str(test_val.1),test_val.0);
+    }
 }

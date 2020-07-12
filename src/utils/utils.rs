@@ -1,6 +1,14 @@
-use std::collections::BTreeMap;
 use std::io::prelude::*;
 
+pub fn collect_bytes(count: usize, mut pos: usize, bytes: &Vec<u8>) -> Vec<u8> {
+    let mut new_vec: Vec<u8> = Vec::new();
+    for _x in 0..count {
+        new_vec.push(bytes[pos]);
+        pos += 1;
+    }
+
+    new_vec
+}
 
 pub fn read_file(f: &str) -> String {
     let file = std::path::Path::new(f);
@@ -11,10 +19,41 @@ pub fn read_file(f: &str) -> String {
     };
 
     contents
+}
+
+pub fn hamming_distance(buf1: &Vec<u8>, buf2: &Vec<u8>) -> u32 {
+    let iter = buf1.iter().zip(buf2.iter());
+    let mut sum = 0;
+    for (x, y) in iter {
+        let xor: u8 = x ^ y;
+        sum += xor.count_ones();
+    }
+
+    sum
+}
+
+pub fn read_file_by_lines_to_str(f: &str) -> String {
+    let f_reader = match std::fs::File::open(std::path::Path::new(f)) {
+        Ok(f) => f,
+        Err(why) => panic!(why.to_string()),
+    };
+
+    let f_reader = std::io::BufReader::new(f_reader);
+    let mut f_buf: String = String::new();
+
+    for line in f_reader.lines() {
+        match line {
+            Ok(l) => f_buf.push_str(l.trim()),
+            Err(why) => panic!(why.to_string()),
+        };
+    }
+
+    f_buf
+
 
 }
 
-pub fn read_file_by_lines(f: &str) -> Vec<String> {
+pub fn read_file_by_lines_to_vec(f: &str) -> Vec<String> {
     let f_reader = match std::fs::File::open(std::path::Path::new(f)) {
         Ok(f) => f,
         Err(why) => panic!(why.to_string()),
@@ -40,6 +79,16 @@ pub fn read_file_by_lines(f: &str) -> Vec<String> {
 mod tests {
 
     use super::*;
+
+    #[test]
+    pub fn test_hamming_distance() {
+        let val1_str = "this is a test";
+        let val2_str = "wokka wokka!!!";
+        let val1_buf: Vec<u8> = val1_str.bytes().collect();
+        let val2_buf: Vec<u8> = val2_str.bytes().collect();
+
+        assert_eq!(hamming_distance(&val1_buf, &val2_buf), 37);
+    }
 
     #[test]
     pub fn test_read_file() {

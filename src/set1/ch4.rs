@@ -24,7 +24,7 @@ pub fn run() {
     let mut results: Vec<Result> = Vec::new();
     let mut count = 0;
 
-    let enc_str = utils::read_file_by_lines(test_file);
+    let enc_str = utils::read_file_by_lines_to_vec(test_file);
 
     for (i, line) in enc_str.iter().enumerate() {
         let hex_enc_str: Vec<u32> = encoders::str_to_hex_val(line.to_string());
