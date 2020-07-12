@@ -1,53 +1,61 @@
 use crate::utils::translators;
+use std::char;
 
 
-fn decode_str(val: &str) -> String {
+pub fn decode_str(val: &str) -> String {
     let mut decoded: String = String::new();
     let mut byte_buf: u32 = 0;
-    let mut buf_size = 0;
+    let mut buf_size: usize = 0;
 
+    let padding = val.len() - val.trim_end_matches('=').len();
+    let val = val.trim_end_matches('=');
+
+    //cw==
     for c in val.chars() {
         buf_size += 1;
-        if c == '=' {
-            continue;
-        } else {
-            dbg!(c);
-            byte_buf |= translators::from_base64(c) as u32;
-            println!("byte_buf: {:b}", byte_buf);
-            if buf_size == 4 {
-                let bytes = decode_match(byte_buf, buf_size);
-                println!("inside: {:b}", bytes);
-                buf_size = 0;
-            }
-            byte_buf <<= 6;
+        // dbg!(c);
+        byte_buf |= translators::from_base64(c) as u32;
+        // println!("1: {:b} buf_size: {}", byte_buf, buf_size);
+        if buf_size == 4 {
+            let bytes = decode_match(byte_buf, buf_size);
+            // println!("inside: {}", bytes);
+            decoded.push_str(&bytes);
+            buf_size = 0;
         }
+        byte_buf <<= 6;
     }
+    // println!("2: {:b} buf_size: {}", byte_buf, buf_size);
 
-    if buf_size != 0 {
-        let bytes = decode_match(byte_buf, buf_size);
-        println!("outside: {:b}", bytes);
+    if padding == 2 {
+        let bytes = decode_match(byte_buf >> 10, buf_size);
+        decoded.push_str(&bytes);
+    }
+    
+    if padding == 1 {
+        let bytes = decode_match(byte_buf >> 8, buf_size);
+        decoded.push_str(&bytes);
     }
 
     decoded
 }
 
 
-fn decode_match(byte_buf: u32, mut buf_size: u8) -> u32 {
-    let mut str_buff: u32 = 0;
-    let mut pos = 0;
-    let mut byte: u32 = 0;
+fn decode_match(byte_buf: u32, mut buf_size: usize) -> String {
+    let mut str_buff: String = String::new();
+    // println!("decode_match -- byte_buf: {:b} buf_size: {}", byte_buf, buf_size);
     while buf_size > 0 {
-        match buf_size {
-            4 => byte = byte_buf & 0xFC0000,
-            3 => byte = byte_buf & 0x3F000,
-            2 => byte = byte_buf & 0xFC0,
-            1 => byte = byte_buf & 0x3F,
+        let byte = match buf_size {
+            4 => ((byte_buf & 0xFF0000) >> 16) as u8,
+            3 => ((byte_buf & 0xFF00) >> 8) as u8,
+            2 => (byte_buf & 0xFF) as u8,
+            1 => break,
             _ => panic!("Error in decode_match, unknown value found"),
-        }
-        buf_size -= 1;
-        str_buff <<= 6;
-        str_buff = str_buff ^ byte;
+        };
 
+        buf_size -= 1;
+        // println!("byte after match {:b} {}", byte, byte);
+        str_buff.push(byte as char);
+        // dbg!(&str_buff);
     }
     str_buff
 }
@@ -57,11 +65,8 @@ mod tests {
 
     use super::*;
 
-    const VAL: &'static str = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
-    const RESULT: &'static str = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
-    
-    const T1: &'static str = "Man is distinguished, not only by his reason, but by this singular passion from other animals, which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure.";
-    const T1_ANSWER: &'static str = "TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGludWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
+    const ASCII: &'static str = "Man is distinguished, not only by his reason, but by this singular passion from other animals, which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure.";
+    const BASE64: &'static str = "TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGludWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
 
     #[test]
     pub fn test_alpha_to_hex() {
@@ -69,6 +74,11 @@ mod tests {
         for a in alpha.chars() {
             println!("{}", a);
         }
+    }
+
+    #[test]
+    pub fn test_base64_to_ascii() {
+        assert_eq!(decode_str(BASE64), ASCII);
     }
 
     #[test]
@@ -134,5 +144,12 @@ mod tests {
         let test_val = ("s", "cw==");
         dbg!(test_val);
         assert_eq!(decode_str(test_val.1),test_val.0);
+    }
+
+    #[test]
+    pub fn test_trim_count() {
+        let x = "cw==";
+        let y = x.trim_end_matches('=');
+        assert_eq!(y.len(), x.len() -2);
     }
 }

@@ -15,7 +15,7 @@ pub fn run() {
     let mut enc_str_pos = 0;
 
     while enc_str_pos < enc_str.len() {
-        // println!("enc_str_pos {} out of {}", enc_str_pos, enc_str.len());
+        println!("enc_str_pos {} out of {}", enc_str_pos, enc_str.len());
 
         let mut key_size = 2;
         while key_size <= MAX_KEY_SIZE {
@@ -23,7 +23,6 @@ pub fn run() {
                 let first: Vec<u8> = utils::collect_bytes(key_size, enc_str_pos, &enc_str.bytes().collect());
                 let second: Vec<u8> = utils::collect_bytes(key_size + 1, enc_str_pos, &enc_str.bytes().collect());
                 let hammings = utils::hamming_distance(&first, &second);
-                // dbg!(hammings);
 
                 results.push((key_size, hammings, hammings / key_size as u32, first, second));
                 key_size += 1;
