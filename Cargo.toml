@@ -1,5 +1,5 @@
 [package]
-name = "challenges"
+name = "cryptopals_lib"
 version = "0.1.0"
 authors = ["Penn Wilbert <pwilbert@gmail.com>"]
 edition = "2018"
@@ -7,3 +7,32 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+[[bin]]
+name = "set1_ch1"
+
+[[bin]]
+name = "set1_ch2"
+
+[[bin]]
+name = "set1_ch3"
+
+[[bin]]
+name = "set1_ch4"
+
+[[bin]]
+name = "set1_ch5"
+
+[[bin]]
+name = "set1_ch6"
+
+
+# [workspace]
+# members = [
+#     "set1_ch1",
+#     "set1_ch2",
+#     "set1_ch3",
+#     "set1_ch4",
+#     "set1_ch5",
+#     "set1_ch6",
+# ]

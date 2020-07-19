@@ -1,8 +1,9 @@
-use crate::challenges::utils::{translators, encoders, text_utils};
+extern crate cryptopals_lib;
+use crate::cryptopals_lib::utils::{translators, encoders, text_utils};
 use std::collections::BTreeMap;
 use std::char;
 
-pub fn run() {
+pub fn main() {
     println!(
         "
         Chapter 1 Challenge 3

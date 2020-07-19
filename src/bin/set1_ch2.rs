@@ -1,7 +1,7 @@
-extern crate challenges;
-use crate::challenges::utils::{translators, encoders};
+extern crate cryptopals_lib;
+use crate::cryptopals_lib::utils::{translators, encoders};
 
-pub fn run() {
+pub fn main() {
     println!(
         "
         Chapter 1 Challenge 2

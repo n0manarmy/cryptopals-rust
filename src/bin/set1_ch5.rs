@@ -1,7 +1,6 @@
-extern crate challenges;
 use std::char;
 
-pub fn run() {
+pub fn main() {
     println!("
 
     Set 1 Challenge 5

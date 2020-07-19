@@ -1,7 +1,7 @@
-extern crate challenges;
-use crate::challenges::base64::encoder;
+extern crate cryptopals_lib;
+use crate::cryptopals_lib::base64::encoder;
 
-pub fn run() {
+pub fn main() {
     println!(
         "
         Chapter 1 Challenge 1
