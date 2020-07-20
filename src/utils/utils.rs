@@ -33,13 +33,9 @@ pub fn read_file(f: &str) -> String {
 
 pub fn hamming_distance(buf1: &Vec<u8>, buf2: &Vec<u8>) -> u32 {
     let iter = buf1.iter().zip(buf2.iter());
-    let mut sum = 0;
-    for (x, y) in iter {
-        let xor: u8 = x ^ y;
-        sum += xor.count_ones();
-    }
 
-    sum
+    iter.map(|(x, y)| (x ^ y).count_ones()).sum()
+
 }
 
 pub fn read_file_by_lines_to_str(f: &str) -> String {

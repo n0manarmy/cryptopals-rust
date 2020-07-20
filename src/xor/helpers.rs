@@ -30,3 +30,17 @@ pub fn single_char_xor(key_size: usize, index: usize, cypher: &Vec<u8>) -> Vec<X
 
     xord_results
 }
+
+pub fn solve_repeating_xor(key: &Vec<char>, cypher: &Vec<u8>) -> Vec<u8>{
+    let mut key_pos = 0;
+    let mut xord_results: Vec<u8> = Vec::new();
+    for c in cypher {
+        if key_pos == key.len() {
+            key_pos = 0;
+        }
+        xord_results.push(c ^ key[key_pos] as u8);
+        key_pos += 1;
+    }
+
+    xord_results
+}

@@ -25,6 +25,7 @@ pub fn main() {
         ");
     let hex_enc_str = String::from("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
     let hex_enc_str: Vec<u32> = encoders::str_to_hex_val(hex_enc_str);
+    let hex_enc_str: Vec<u8> = hex_enc_str.iter().map(|x| *x as u8).collect();
     let alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     type Result = (f32, BTreeMap<String, f32>, Vec<char>, char);
@@ -33,15 +34,10 @@ pub fn main() {
 
     for a in alpha.bytes() {
         // xor buffer with char
-        let xord_buf: Vec<u32> = hex_enc_str.iter().map(|x| *x as u32 ^ a as u32).collect();
+        let xord_buf: Vec<u8> = hex_enc_str.iter().map(|x| *x ^ a).collect();
 
         // convert xor'd buffer to ascii
-        let decoded: Vec<char> = xord_buf.iter().map(|x| {
-            let bytes_to_hex = format!("{:X}", x);
-            translators::hex_string_to_ascii(bytes_to_hex)
-
-        }).collect();
-
+        let decoded = xord_buf.iter().map(|x| *x as char).collect();
         let this_result = text_utils::ascii_scoring(&decoded);
 
         results.push((this_result.0, this_result.1, decoded, a as char));

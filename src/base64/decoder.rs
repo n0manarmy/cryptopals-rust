@@ -1,7 +1,6 @@
 use crate::utils::translators;
 use std::char;
 
-
 pub fn decode_str(val: &str) -> String {
     let mut decoded: String = String::new();
     let mut byte_buf: u32 = 0;

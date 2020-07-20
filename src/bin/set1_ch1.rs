@@ -1,5 +1,5 @@
 extern crate cryptopals_lib;
-use crate::cryptopals_lib::base64::encoder;
+use crate::cryptopals_lib::base64::{encoder, decoder};
 
 pub fn main() {
     println!(
@@ -24,6 +24,8 @@ pub fn main() {
     let result = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
     
     dbg!(assert_eq!(encoder::encode_hex_str(val), result));
-
     assert_eq!(encoder::encode_hex_str(val), result);
+
+    let decode = decoder::decode_str(result);
+    println!("decoded {}", &decode);
 }
