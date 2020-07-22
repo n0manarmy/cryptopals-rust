@@ -1,5 +1,6 @@
 extern crate cryptopals_lib;
-use crate::cryptopals_lib::utils::{translators, encoders, text_utils};
+use crate::cryptopals_lib::utils::{text_utils};
+use crate::cryptopals_lib::hex;
 use std::collections::BTreeMap;
 use std::char;
 
@@ -24,7 +25,7 @@ pub fn main() {
         You now have our permission to make \"ETAOIN SHRDLU\" jokes on Twitter.
         ");
     let hex_enc_str = String::from("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
-    let hex_enc_str: Vec<u32> = encoders::str_to_hex_val(hex_enc_str);
+    let hex_enc_str: Vec<u32> = hex::encoders::str_to_hex_val(hex_enc_str);
     let hex_enc_str: Vec<u8> = hex_enc_str.iter().map(|x| *x as u8).collect();
     let alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 

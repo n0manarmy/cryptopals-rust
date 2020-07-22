@@ -42,7 +42,6 @@ pub fn encode_hex_str(buf: &'static str) -> String {
 
         if buf_size == 6 {
             let encoding = encode_match(byte_buf, buf_size/2);
-            // dbg!(&encoding);
             encoded.push_str(&encoding);
             byte_buf = 0;
             buf_size = 0;
@@ -53,7 +52,6 @@ pub fn encode_hex_str(buf: &'static str) -> String {
     }
 
     if buf_size != 0 {
-        // dbg!(byte_buf);
         let encoding = encode_match(byte_buf, buf_size/2);
         encoded.push_str(&encoding);
     }

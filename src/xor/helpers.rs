@@ -1,5 +1,5 @@
 use std::collections::BTreeMap;
-use crate::utils::{text_utils, utils, encoders};
+use crate::utils::text_utils;
 
 #[derive(Clone)]
 pub struct XorResult {
@@ -9,6 +9,31 @@ pub struct XorResult {
     pub b_tree_map_result: BTreeMap<String, f32>,
     pub decode: Vec<char>,
     pub key: char,
+}
+
+pub fn xor_same_size_buffers(buf1: Vec<u32>, buf2: Vec<u32>) -> Vec<u32> {
+    let mut xor_results: Vec<u32> = Vec::new();
+    let mut pos = 0;
+    if buf1.len() != buf2.len() {
+        panic!("buffers are not equal length");
+    };
+
+    while pos < buf1.len() {
+        xor_results.push(buf1[pos] ^ buf2[pos]);
+        pos += 1;
+    }
+
+    xor_results
+
+}
+
+pub fn xor_buf_against_value(buf: &Vec<u32>, val: u32) -> Vec<u32> {
+    let mut xor_results: Vec<u32> = Vec::new();
+    for b in buf {
+        xor_results.push(b ^ val)
+    }
+
+    xor_results
 }
 
 pub fn single_char_xor(key_size: usize, index: usize, cypher: &Vec<u8>) -> Vec<XorResult> {

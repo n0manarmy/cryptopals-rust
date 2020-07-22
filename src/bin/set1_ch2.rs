@@ -1,5 +1,6 @@
 extern crate cryptopals_lib;
-use crate::cryptopals_lib::utils::{translators, encoders};
+use crate::cryptopals_lib::utils::{translators};
+use crate::cryptopals_lib::xor;
 
 pub fn main() {
     println!(
@@ -31,7 +32,7 @@ pub fn main() {
     // let a_bytes: Vec<u32> = encoders::hex_str_to_hex_val(a_val);
     // let b_bytes: Vec<u32> = encoders::hex_str_to_hex_val(b_val);
 
-    let result = encoders::xor_same_size_buffers(a_bytes, b_bytes);
+    let result = xor::helpers::xor_same_size_buffers(a_bytes, b_bytes);
     let result_str: String = result.iter().map(|x| translators::to_hex(&x)).collect();
     
     dbg!(assert_eq!(result_str, "746865206b696420646f6e277420706c6179"));

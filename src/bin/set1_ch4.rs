@@ -1,9 +1,7 @@
 extern crate cryptopals_lib;
-use std::collections::BTreeMap;
 use std::cmp::Ordering;
-use std::char;
-use crate::cryptopals_lib::xor::{helpers, helpers::XorResult};
-use crate::cryptopals_lib::utils::{text_utils, utils, encoders};
+use crate::cryptopals_lib::{xor, hex};
+use crate::cryptopals_lib::utils::{text_utils, file_io_utils};
 
 pub fn main() {
     println!("
@@ -21,21 +19,21 @@ pub fn main() {
     ");
 
     let test_file = "challenge_files/4.txt";
-    let mut xord_buff: Vec<XorResult> = Vec::new();
+    let mut xord_buff: Vec<xor::helpers::XorResult> = Vec::new();
 
     //read file into buffer
-    let enc_str = utils::read_file_by_lines_to_vec(test_file);
+    let enc_str = file_io_utils::read_file_by_lines_to_vec(test_file);
 
     for (i, line) in enc_str.iter().enumerate() {
         //decode hex values to bytes
-        let hex_enc_str: Vec<u32> = encoders::str_to_hex_val(line.to_string());
+        let hex_enc_str: Vec<u32> = hex::encoders::str_to_hex_val(line.to_string());
         let hex_enc_str: Vec<u8> = hex_enc_str.iter().map(|x| *x as u8).collect();
 
-        let mut temp = helpers::single_char_xor(1, i, &hex_enc_str);
+        let mut temp = xor::helpers::single_char_xor(1, i, &hex_enc_str);
         xord_buff.append(&mut temp);
     }
 
-    let mut filtered: Vec<XorResult> = Vec::new();
+    let mut filtered: Vec<xor::helpers::XorResult> = Vec::new();
     const MIN_SPACE_COUNT: u32 = 3;
 
     let filter = true;
