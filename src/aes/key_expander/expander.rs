@@ -1,4 +1,5 @@
 use crate::aes::key_expander::helper::{ek, rot_word, rcon, collect_to_vec, k};
+use crate::aes::printer::print_state;
 use crate::aes;
 
 pub fn expand(key: &Vec<u8>) -> Vec<u8> {
@@ -45,7 +46,7 @@ pub fn expand(key: &Vec<u8>) -> Vec<u8> {
         expanded_key.append(&mut xord);
         // print!("len: {} ", (expanded_key.len() /4) - 1);
         x += 1;
-        println!();
+        // println!();
         
         let mut sub = 3;
         if r_setup.0 == 52 {
@@ -68,7 +69,7 @@ pub fn expand(key: &Vec<u8>) -> Vec<u8> {
             // print!("b: {:08x} ", b);
             expanded_key.append(&mut collect_to_vec(a ^ b));
             // print!("len: {} ", (expanded_key.len() /4) - 1);
-            println!();
+            // println!();
             x += 1;
         }
 
@@ -77,10 +78,129 @@ pub fn expand(key: &Vec<u8>) -> Vec<u8> {
     expanded_key
 }
 
+pub fn eq_inv_expand(key: &Vec<u8>) -> Vec<u8> {
+
+    //block size is always 16
+    const BLOCK_SIZE: usize = 16;
+    
+    //expand the expanded key to be the key_size * block_size + 1 per specs
+    let r_setup = match key.len() {
+        16  => (44, 4),
+        24  => (52, 6),
+        32  => (60, 8),
+        _ => panic!("Error in expand. Key_size non standard"),
+    };
+
+    let mut expanded_key: Vec<u8> = Vec::with_capacity((key.len() * BLOCK_SIZE) + 1);
+
+    // start key expansion
+    let mut x = 0;
+    while x < r_setup.0 {
+        if x < r_setup.1 {
+            // println!("xs: {} - ", x);
+            let mut sub_key: Vec<u8> = k(x * 4, &key);
+            expanded_key.append(&mut sub_key);
+            x += 1;
+            continue;
+        }
+        
+        //sub word application
+        // print!("xo: {} - ", x);
+        let ek_first = ek((x - 1) * 4, &expanded_key);
+        // print!("ekf: {:08x} ", ek_first);
+        let ek_first = rot_word(ek_first);
+        // print!("rot: {:08x} ", ek_first);
+        let ek_first = aes::helper::byte_sub(ek_first);
+        // print!("sub: {:08x} ", ek_first);
+        let rconned = rcon(x, key.len());
+        // print!("rcn: {:08x} ", rconned);
+        let ek_second = ek(((x - 4) * 4).into(), &expanded_key);
+        // print!("eks: {:08x} ", ek_second);
+        let xord = ek_first ^ ek_second ^ rconned;
+        // print!("xrd: {:08x} ", xord);
+        let mut xord = collect_to_vec(xord);
+        expanded_key.append(&mut xord);
+        // print!("len: {} ", (expanded_key.len() /4) - 1);
+        x += 1;
+        // println!();
+        
+        let mut sub = 3;
+        if r_setup.0 == 52 {
+            sub = 5;
+        }
+        
+        for _z in 0..sub {
+            // 192bit keys finish with 3 rounds instead of standard 5 rounds for 192bit.
+            if sub == 5 && x == 52 {
+                break;
+            }
+            // 240bit keys finish with 2 rounds instead of standard 3 rounds for 256bit
+            if sub == 3 && x == 60 {
+                break;
+            }
+            // print!("xi: {} - ", x);
+            let a = ek((x - 1) * 4, &expanded_key);
+            // print!("a: {:08x} ", a);
+            let b = ek((x - 4) * 4, &expanded_key);
+            // print!("b: {:08x} ", b);
+            expanded_key.append(&mut collect_to_vec(a ^ b));
+            // print!("len: {} ", (expanded_key.len() /4) - 1);
+            // println!();
+            x += 1;
+        }
+
+    }
+
+
+
+    expanded_key
+}
+/*
+KeyExpansion(byte key[4*Nk], word w[Nb*(Nr+1)], Nk)
+begin
+    word temp
+    i = 0
+    while (i < Nk)
+        w[i] = word(key[4*i], key[4*i+1], key[4*i+2], key[4*i+3])
+        i = i+1
+    end while
+
+    i = Nk
+    
+    while (i < Nb * (Nr+1)]
+        temp = w[i-1]
+    if (i mod Nk = 0)
+        temp = SubWord(RotWord(temp)) xor Rcon[i/Nk]
+    else if (Nk > 6 and i mod Nk = 4)
+        temp = SubWord(temp)
+    end if
+    w[i] = w[i-Nk] xor temp
+    i = i + 1
+    end while
+
+    for i = 0 step 1 to (Nr+1)*Nb-1
+        dw[i] = w[i]
+    end for
+    for round = 1 step 1 to Nr-1
+        InvMixColumns(dw[round*Nb, (round+1)*Nb-1])
+    end for
+end
+
+
+
+Note that Nk=4, 6, and 8 do not all have to be implemented;
+they are all included in the conditional statement above for
+conciseness.
+Specific implementation requirements for the
+Cipher Key are presented in Sec. 6.1.
+*/
+
 #[cfg(test)]
 mod tests {
 
     use super::*;
+    use crate::aes::helper;
+    use crate::hex;
 
     #[test]
     pub fn test_expand_128() {
@@ -89,13 +209,18 @@ mod tests {
         let expanded = expand(&key);
         assert_eq!(expanded.len(), (44 * 4));
         
-        for x in 0..expanded.len() {
-            if x % 4 == 0 {
-                println!();
-                print!("{} ", (x/4) + 1);
-            }
-            print!("{:02x}", expanded[x]);
-        }
+        print_state(&expanded);
+    }
+
+    #[test]
+    pub fn test_expand_plain_128() {
+        // let key: Vec<u8> = String::from("1234567890111213").bytes().collect();
+        let cipher = "000102030405060708090a0b0c0d0e0f";
+        let cipher: Vec<u8> = hex::encoders::str_to_hex_u8_buf(cipher);
+        let expanded = expand(&cipher);
+        assert_eq!(expanded.len(), (44 * 4));
+        
+        print_state(&expanded);
     }
 
     #[test]
