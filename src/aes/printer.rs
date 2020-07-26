@@ -1,7 +1,7 @@
 pub fn print_state(state: &Vec<u8>) {
     const VERT: u8 = 1;
     let mut horz = 0;
-    // horz = VERT;
+    horz = VERT;
     if horz == 0 {
         for x in 0..state.len() {
             if x % 4 == 0 {

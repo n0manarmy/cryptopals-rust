@@ -1,6 +1,7 @@
 use crate::aes::key_expander::expander;
 use crate::aes::helper;
 use crate::aes::tables;
+use crate::aes::test_vals::test_tables;
 use crate::aes::printer::print_state;
 
 pub struct Decrypt {
@@ -27,62 +28,75 @@ impl Decrypt {
     }
 
     pub fn decrypt(self, input: Vec<u8>) -> Vec<u8> {
-        print!("start -- input state");
+        print!("0 -- iinput");
         print_state(&input);
+        assert_eq!(&input, &test_tables::inv_cipher_128((0,"iinput")));
 
-        print!("transform input state");
-        let mut state = helper::transform_state(input);
-        print_state(&state);
+        // print!("transform input state");
+        // let mut state = helper::transform_state(input);
+        // print_state(&state);
 
-        print!("this round exp key");
-        let this_exp_key: Vec<u8> = helper::transform_state(
-            helper::get_this_round_exp_key(self.rounds as usize, &self.expanded_key));
-        print_state(&this_exp_key);
+        print!("0 - ik_sch");
+        // let ik_sch: Vec<u8> = helper::transform_state(
+        //     helper::get_this_round_exp_key(self.rounds as usize, &self.expanded_key));
+        let ik_sch: Vec<u8> = helper::get_key_sch(self.rounds as usize, &self.expanded_key);
+        print_state(&ik_sch);
+        assert_eq!(&ik_sch, &test_tables::inv_cipher_128((0,"ik_sch")));
+        // let ik_sch = helper::transform_state(ik_sch);
 
-        print!("start add round key");
-        state = helper::add_round_key(state, this_exp_key);
-        print_state(&state);
+        // print!("start add round key");
+        let mut state = helper::add_round_key(input, ik_sch);
+        // print_state(&state);
 
         for x in 1..self.rounds {
-            print!("\n{} - round start", x);
+            print!("\n{} - istart", x);
+            // state = helper::transform_state(state);
             print_state(&state);
+            assert_eq!(&state, &test_tables::inv_cipher_128((x,"istart")));
 
-            print!("\n{} - inv s_box", x);
-            state = state.iter().map(|x| tables::inv_s_box(*x)).collect();
-            print_state(&state);
-
-            print!("\n{} - inv shift_rows", x);
+            print!("\n{} - is_row", x);
             state = helper::inv_shift_rows(state);
             print_state(&state);
+            assert_eq!(&state, &test_tables::inv_cipher_128((x,"is_row")));
 
-            print!("\n{} - inv mix_colums", x);
+            print!("\n{} - is_box", x);
+            state = state.iter().map(|x| tables::inv_s_box(*x)).collect();
+            print_state(&state);
+            assert_eq!(&state, &test_tables::inv_cipher_128((x,"is_box")));
+
+            print!("\n{} - ik_sch", x);
+            // let ik_sch: Vec<u8> = helper::transform_state(
+            //     helper::get_this_round_exp_key((self.rounds - x) as usize, &self.expanded_key));
+            let ik_sch: Vec<u8> = helper::get_key_sch((self.rounds - x) as usize, &self.expanded_key);
+            print_state(&ik_sch);
+            assert_eq!(&state, &test_tables::inv_cipher_128((x,"ik_sch")));
+
+            print!("\n{} - ik_add", x);
+            state = helper::add_round_key(state, ik_sch);
+            print_state(&state);
+            assert_eq!(&state, &test_tables::inv_cipher_128((x,"ik_add")));
+
+            print!("\n{} - im_col", x);
             state = helper::inv_mix_column(state);
-            print_state(&state);
-            
-            print!("\n{} - this exp key", x);
-            let this_exp_key: Vec<u8> = helper::transform_state(
-                helper::get_this_round_exp_key((self.rounds - x) as usize, &self.expanded_key));
-            print_state(&this_exp_key);
-
-            print!("\n======= {} - add_round =======", x);
-            state = helper::add_round_key(state, this_exp_key);
-            print_state(&state);
+            print_state(&state);            
         }
 
-        print!("\n{} - inv_s_box", 0);
-        state = state.iter().map(|x| tables::inv_s_box(*x)).collect();
-        print_state(&state);
-
-        print!("\n{} - inv shift_rows", 0);
+        print!("\n{} - inv is_row", 0);
         state = helper::inv_shift_rows(state);
         print_state(&state);
 
-        print!("this exp key");
-        let this_exp_key: Vec<u8> = helper::transform_state(
-            helper::get_this_round_exp_key(0, &self.expanded_key));
-        print_state(&this_exp_key);
+        print!("\n{} - is_box", 0);
+        state = state.iter().map(|x| tables::inv_s_box(*x)).collect();
+        print_state(&state);
 
-        state = helper::add_round_key(state, this_exp_key);        
+        print!("ik_sch");
+        // let ik_sch: Vec<u8> = helper::transform_state(
+        let ik_sch: Vec<u8> = helper::get_key_sch(0, &self.expanded_key);
+        print_state(&ik_sch);
+        
+        print!("\n{} - ik_add", 0);
+        state = helper::add_round_key(state, ik_sch);        
+        print_state(&state);
 
         // helper::transform_state(output)
         state
@@ -133,5 +147,4 @@ mod tests {
         let output: String = output.iter().map(|x| format!("{:02x}", x)).collect();
         assert_eq!(&output, result);
     }
-
 }

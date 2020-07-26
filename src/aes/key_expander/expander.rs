@@ -1,4 +1,5 @@
 use crate::aes::key_expander::helper::{ek, rot_word, rcon, collect_to_vec, k};
+use crate::aes::helper::inv_mix_column;
 use crate::aes::printer::print_state;
 use crate::aes;
 
@@ -78,7 +79,7 @@ pub fn expand(key: &Vec<u8>) -> Vec<u8> {
     expanded_key
 }
 
-pub fn eq_inv_expand(key: &Vec<u8>) -> Vec<u8> {
+pub fn eq_inv_expand(key: &Vec<u8>, rounds: u32) -> Vec<u8> {
 
     //block size is always 16
     const BLOCK_SIZE: usize = 16;
@@ -151,7 +152,14 @@ pub fn eq_inv_expand(key: &Vec<u8>) -> Vec<u8> {
 
     }
 
+    // let mut inv_exp_key: Vec<u8> = vec![0;expanded_key.len()];
+    // for x in 0..(r_setup.1 + 1) * (rounds - 1) as usize {
+    //     inv_exp_key[x] = expanded_key[x];
+    // }
+    // inv_exp_key = inv_mix_column(inv_exp_key);
+    expanded_key = inv_mix_column(expanded_key);
 
+    // inv_exp_key
 
     expanded_key
 }

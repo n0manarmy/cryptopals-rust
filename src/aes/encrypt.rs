@@ -27,64 +27,68 @@ impl Encrypt {
     }
 
     pub fn encrypt(self, input: Vec<u8>) -> Vec<u8> {
-        println!("start -- input state");
+        print!("0 -- input");
         print_state(&input);
 
-        println!("transform input state");
-        let mut state = helper::transform_state(input);
-        print_state(&state);
+        // print!("transform input state");
+        // let mut state = helper::transform_state(input);
+        // print_state(&state);
+        let mut state = input;
 
-        println!("this exp key");
-        let this_exp_key: Vec<u8> = helper::transform_state(
-            helper::get_this_round_exp_key(0, &self.expanded_key));
-        print_state(&this_exp_key);
+        print!("0 - k_sch");
+        let ik_sch: Vec<u8> = helper::get_key_sch(0, &self.expanded_key);
+        print_state(&ik_sch);
+        // let ik_sch = helper::transform_state(ik_sch);
 
-        println!("start add round key");
-        state = helper::add_round_key(state, this_exp_key);
-        print_state(&state);
+        // print!("start add round key");
+        state = helper::add_round_key(state, ik_sch);
+        // print_state(&state);
 
         for x in 1..self.rounds {
-            println!("\n{} - round start", x);
+            print!("\n{} - start", x);
             print_state(&state);
 
-            println!("\n{} - s_box", x);
+            print!("\n{} - s_box", x);
             state = state.iter().map(|x| tables::s_box(*x)).collect();
             print_state(&state);
 
-            println!("\n{} - shift_rows", x);
+            print!("\n{} - s_row", x);
             state = helper::shift_rows(state);
             print_state(&state);
 
-            println!("\n{} - mix_colums", x);
+            print!("\n{} - m_col", x);
             state = helper::mix_column(state);
             print_state(&state);
 
-            println!("\n{} - this exp key", x);
-            let this_exp_key: Vec<u8> = helper::transform_state(helper::get_this_round_exp_key(x as usize, &self.expanded_key));
-            print_state(&this_exp_key);
+            print!("\n{} - k_sch", x);
+            // let ik_sch: Vec<u8> = helper::transform_state(
+                // helper::get_this_round_exp_key(x as usize, &self.expanded_key));
+            
+            let ik_sch: Vec<u8> = helper::get_key_sch(x as usize, &self.expanded_key);
+            print_state(&ik_sch);
 
-            println!("\n======= {} - add_round =======", x);
-            state = helper::transform_state(
-                helper::add_round_key(state, this_exp_key));
+            print!("\n{} - k_add", x);
+            state = helper::add_round_key(state, ik_sch);
             print_state(&state);
         }
 
 
-        println!("\n{} - s_box", self.rounds);
+        print!("\n{} - s_box", self.rounds);
         state = state.iter().map(|x| tables::s_box(*x)).collect();
         print_state(&state);
 
-        println!("\n{} - shift_rows", self.rounds);
+        print!("\n{} - s_row", self.rounds);
         state = helper::shift_rows(state);
         print_state(&state);
 
-        println!("this exp key");
-        let this_exp_key: Vec<u8> = helper::transform_state(helper::get_this_round_exp_key(self.rounds as usize, &self.expanded_key));
-        print_state(&this_exp_key);
+        print!("k_sch");
+        // let ik_sch: Vec<u8> = helper::transform_state(helper::get_this_round_exp_key(self.rounds as usize, &self.expanded_key));
+        let ik_sch: Vec<u8> = helper::get_key_sch(self.rounds as usize, &self.expanded_key);
+        print_state(&ik_sch);
 
-        state = helper::add_round_key(state, this_exp_key);        
+        state = helper::add_round_key(state, ik_sch);        
 
-        // helper::transform_state(output)
+        // helper::transform_state(output)  
         state
     }
 }
@@ -121,7 +125,8 @@ mod tests {
         let result = "69c4e0d86a7b0430d8cdb78070b4c55a";
 
         let encryptor = Encrypt::new(cipher);
-        let output: Vec<u8> = helper::transform_state(encryptor.encrypt(input));
+        // let output: Vec<u8> = helper::transform_state(encryptor.encrypt(input));
+        let output: Vec<u8> = encryptor.encrypt(input);
         print_state(&output);
         let output: String = output.iter().map(|x| format!("{:02x}", x)).collect();
         println!("output: {}", &output);

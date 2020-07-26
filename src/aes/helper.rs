@@ -1,6 +1,6 @@
 use crate::aes::tables as tbl;
 
-pub fn get_this_round_exp_key(round: usize, exp_key: &Vec<u8>) -> Vec<u8> {
+pub fn get_key_sch(round: usize, exp_key: &Vec<u8>) -> Vec<u8> {
     let e_pos = round * 16;
     let mut this_exp_key: Vec<u8> = vec![0;16];
     this_exp_key.clone_from_slice(&exp_key[e_pos..e_pos + 16]);
@@ -11,15 +11,13 @@ pub fn get_this_round_exp_key(round: usize, exp_key: &Vec<u8>) -> Vec<u8> {
 }
 
 pub fn add_round_key(mut state: Vec<u8>, exp_key: Vec<u8>) -> Vec<u8>{
-    // print_state(&state);
-    // while s_pos < state.len() {
-    //     // print!("s: {:02x} e: {:02x} => s^e ", &state[s_pos], exp_key[s_pos + e_pos]);
-    //     state[s_pos] = state[s_pos] ^ exp_key[s_pos + e_pos];
-    //     // println!("{:02x}", &state[s_pos]);
-    //     s_pos += 1;
-    // }
     let iter = state.iter().zip(exp_key.iter());
     state = iter.map(|(s, e)| s ^ e).collect::<Vec<u8>>();
+    // let mut x = 0;
+    // let mut y = 0;
+    // for _z in 0..state.len() {
+    //     state[xy_idx(x: i32, y: i32)]
+    // }
 
     state
 }
@@ -52,9 +50,10 @@ pub fn byte_sub(word: u32) -> u32 {
 
 }
 
-pub fn shift_rows(state: Vec<u8>) -> Vec<u8> {
+pub fn shift_rows(mut state: Vec<u8>) -> Vec<u8> {
 
     let mut t_state: Vec<u8> = vec![0; 16];
+    state = transform_state(state);
     t_state[0] = state[0];
     t_state[1] = state[1];
     t_state[2] = state[2];
@@ -75,31 +74,91 @@ pub fn shift_rows(state: Vec<u8>) -> Vec<u8> {
     t_state[14] = state[13];
     t_state[15] = state[14];
 
-    t_state
+    // t_state[0] = state[0];
+    // t_state[1] = state[4];
+    // t_state[2] = state[8];
+    // t_state[3] = state[12];
+
+    // t_state[4] = state[5];
+    // t_state[5] = state[9];
+    // t_state[6] = state[14];
+    // t_state[7] = state[1];
+    
+    // t_state[8] = state[10];
+    // t_state[9] = state[14];
+    // t_state[10] = state[2];
+    // t_state[11] = state[6];
+    
+    // t_state[12] = state[15];
+    // t_state[13] = state[3];
+    // t_state[14] = state[7];
+    // t_state[15] = state[11];
+
+    // t_state[0] = state[0];
+    // t_state[1] = state[5];
+    // t_state[2] = state[10];
+    // t_state[3] = state[15];
+
+    // t_state[4] = state[5];
+    // t_state[5] = state[9];
+    // t_state[6] = state[14];
+    // t_state[7] = state[3];
+    
+    // t_state[8] = state[10];
+    // t_state[9] = state[13];
+    // t_state[10] = state[2];
+    // t_state[11] = state[7];
+    
+    // t_state[12] = state[15];
+    // t_state[13] = state[1];
+    // t_state[14] = state[6];
+    // t_state[15] = state[11];
+
+    transform_state(t_state)
 }
 
 pub fn inv_shift_rows(state: Vec<u8>) -> Vec<u8> {
 
     let mut t_state: Vec<u8> = vec![0; 16];
-    t_state[0] = state[0];
-    t_state[1] = state[1];
-    t_state[2] = state[2];
-    t_state[3] = state[3];
+    // t_state[0] = state[0];
+    // t_state[1] = state[1];
+    // t_state[2] = state[2];
+    // t_state[3] = state[3];
 
-    t_state[4] = state[7];
-    t_state[5] = state[4];
+    // t_state[4] = state[7];
+    // t_state[5] = state[4];
+    // t_state[6] = state[5];
+    // t_state[7] = state[6];
+    
+    // t_state[8] = state[10];
+    // t_state[9] = state[11];
+    // t_state[10] = state[8];
+    // t_state[11] = state[9];
+    
+    // t_state[12] = state[13];
+    // t_state[13] = state[14];
+    // t_state[14] = state[15];
+    // t_state[15] = state[12];
+
+    t_state[0] = state[0];
+    t_state[1] = state[4];
+    t_state[2] = state[8];
+    t_state[3] = state[12];
+
+    t_state[4] = state[13];
+    t_state[5] = state[1];
     t_state[6] = state[5];
-    t_state[7] = state[6];
+    t_state[7] = state[9];
     
     t_state[8] = state[10];
-    t_state[9] = state[11];
-    t_state[10] = state[8];
-    t_state[11] = state[9];
+    t_state[9] = state[14];
+    t_state[10] = state[2];
+    t_state[11] = state[6];
     
-    t_state[12] = state[13];
-    t_state[13] = state[14];
+    t_state[12] = state[7];
+    t_state[13] = state[11];
     t_state[14] = state[15];
-    t_state[15] = state[12];
+    t_state[15] = state[3];
 
     t_state
 }
@@ -228,70 +287,50 @@ pub fn inv_mix_column(state: Vec<u8>) -> Vec<u8> {
 pub fn mix_column(state: Vec<u8>) -> Vec<u8> {
     // println!("##### start mix column");
     let mut t_state: Vec<u8> = vec![0;state.len()];
-    let mut inv_m_col = 0;
-    let inv_m_row = 0;
+    let mut m_col = 0;
+    let m_row = 0;
     let mut s_pos: i32 = 0;
-    let mut x = 0;
-    let y = 0;
+    let x = 0;
+    let mut y = 0;
 
     while s_pos < state.len() as i32 {
-        if inv_m_col == 3 {
-            inv_m_col = 0;
+        if m_col == 3 {
+            m_col = 0;
         }
-        t_state[xy_idx(x, y)] =
-            tbl::e_box(
-                l_box_overflow_check(
-                    tbl::l_box(state[xy_idx(x, y)]), tbl::l_box(tbl::m_mtrx(inv_m_row, inv_m_col)))) ^ 
-            tbl::e_box(
-                l_box_overflow_check(
-                    tbl::l_box(state[xy_idx(x, y + 1)]) , tbl::l_box(tbl::m_mtrx(inv_m_row + 1, inv_m_col)))) ^ 
-            state[xy_idx(x, y + 2)] ^
-            state[xy_idx(x, y + 3)];
-        
-        inv_m_col += 1;
+        let t1 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 0, y)]), tbl::l_box(tbl::m_mtrx(m_row, m_col)));
+        let t2 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 1, y)]) , tbl::l_box(tbl::m_mtrx(m_row + 1, m_col)));
+        let t3 = state[xy_idx(x + 2, y)];
+        let t4 = state[xy_idx(x + 3, y)];
+        t_state[xy_idx(x, y)] = tbl::e_box(t1) ^ tbl::e_box(t2) ^ t3 ^ t4;
         // println!("1 -- t_state: {:02x} at {},{}", t_state[xy_idx(x, y)], x, y);
         
-
-        t_state[xy_idx(x, y + 1)] = 
-            state[xy_idx(x, y)] ^ 
-            tbl::e_box(
-                l_box_overflow_check(
-                    tbl::l_box(state[xy_idx(x, y + 1)]) , tbl::l_box(tbl::m_mtrx(inv_m_row + 1, inv_m_col)))) ^
-            tbl::e_box(
-                l_box_overflow_check(
-                    tbl::l_box(state[xy_idx(x, y + 2)]) , tbl::l_box(tbl::m_mtrx(inv_m_row + 2, inv_m_col)))) ^ 
-            state[xy_idx(x, y + 3)];
-        
-        inv_m_col += 1;
+        m_col += 1;
+        let t1 = state[xy_idx(x + 0, y)];
+        let t2 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 1, y)]) , tbl::l_box(tbl::m_mtrx(m_row + 1, m_col)));
+        let t3 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 2, y)]) , tbl::l_box(tbl::m_mtrx(m_row + 2, m_col)));
+        let t4 = state[xy_idx(x + 3, y)];
+        t_state[xy_idx(x + 1, y)] = t1 ^ tbl::e_box(t2) ^ tbl::e_box(t3) ^ t4;
         // println!("2 -- t_state: {:02x} at {},{}", t_state[xy_idx(x, y + 1)], x, y);
 
-        t_state[xy_idx(x, y + 2)] = 
-            state[xy_idx(x, y)] ^ 
-            state[xy_idx(x, y + 1)] ^
-            tbl::e_box(
-                l_box_overflow_check(
-                    tbl::l_box(state[xy_idx(x, y + 2)]) , tbl::l_box(tbl::m_mtrx(inv_m_row + 2, inv_m_col)))) ^ 
-            tbl::e_box(
-                l_box_overflow_check(
-                    tbl::l_box(state[xy_idx(x, y + 3)]) , tbl::l_box(tbl::m_mtrx(inv_m_row + 3, inv_m_col))));
-
-        inv_m_col += 1;
+        m_col += 1;
+        let t1 = state[xy_idx(x + 0, y)];
+        let t2 = state[xy_idx(x + 1, y)];
+        let t3 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 2, y)]) , tbl::l_box(tbl::m_mtrx(m_row + 2, m_col)));
+        let t4 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 3, y)]) , tbl::l_box(tbl::m_mtrx(m_row + 3, m_col)));
+        t_state[xy_idx(x + 2, y)] = t1 ^ t2 ^ tbl::e_box(t3) ^ tbl::e_box(t4);
         // println!("3 -- t_state: {:02x} at {},{}", t_state[xy_idx(x, y + 2)], x, y);
-
-        t_state[xy_idx(x, y + 3)] = 
-            tbl::e_box(
-                l_box_overflow_check(
-                    tbl::l_box(state[xy_idx(x, y)])     , tbl::l_box(tbl::m_mtrx(inv_m_row, inv_m_col)))) ^ 
-            state[xy_idx(x, y + 1)] ^
-            state[xy_idx(x, y + 2)] ^ 
-            tbl::e_box(
-                l_box_overflow_check(
-                    tbl::l_box(state[xy_idx(x, y + 3)]) , tbl::l_box(tbl::m_mtrx(inv_m_row + 3, inv_m_col))));
+        
+        m_col += 1;
+        let t1 = l_box_overflow_check(tbl::l_box(state[xy_idx(x, y)])     , tbl::l_box(tbl::m_mtrx(m_row, m_col)));
+        let t2 = state[xy_idx(x + 1, y)];
+        let t3 = state[xy_idx(x + 2, y)];
+        let t4 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 3, y)]) , tbl::l_box(tbl::m_mtrx(m_row + 3, m_col)));
+        t_state[xy_idx(x + 3, y)] = tbl::e_box(t1) ^ t2 ^ t3 ^ tbl::e_box(t4);
         
         // println!("4 -- t_state: {:02x} at {},{}", t_state[xy_idx(x, y + 3)], x, y);
         
         s_pos += 4;
-        x += 1;
+        y += 1;
         // dbg!(s_pos);
         // dbg!(x);
         // dbg!(&t_state);
@@ -325,14 +364,14 @@ mod tests {
         let expanded: Vec<u8> = key_expander::expander::expand(&cipher_key);
         print_state(&expanded);
 
-        println!("transform state");
-        let state = transform_state(input);
-        print_state(&state);
+        // println!("transform state");
+        // let state = transform_state(input);
+        // print_state(&state);
 
         println!("add round key");
-        let this_exp_key = get_this_round_exp_key(0, &expanded);
-        let this_exp_key = transform_state(this_exp_key);
-        let state = add_round_key(state, this_exp_key);
+        let this_exp_key = get_key_sch(0, &expanded);
+        // let this_exp_key = transform_state(this_exp_key);
+        let state = add_round_key(input, this_exp_key);
         print_state(&state);
         
     }
@@ -346,14 +385,10 @@ mod tests {
 
     #[test]
     pub fn test_mix_column() {
-        // let state: Vec<u8> = vec![0xD4, 0xBF, 0x5D, 0x30, 0xD4, 0xBF, 0x5D, 0x30, 0xD4, 0xBF, 0x5D, 0x30, 0xD4, 0xBF, 0x5D, 0x30];
-        let state: Vec<u8> = vec![0xD4, 0xBF, 0x5D, 0x30, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,];
+        let state: Vec<u8> = vec![0xD4, 0xBF, 0x5D, 0x30, 0xD4, 0xBF, 0x5D, 0x30, 0xD4, 0xBF, 0x5D, 0x30, 0xD4, 0xBF, 0x5D, 0x30];
+        // let state: Vec<u8> = vec![0xD4, 0xBF, 0x5D, 0x30, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,];
         // let state: Vec<u8> = vec![0xD4, 0xBF, 0x5D, 0x30];
-        let state = transform_state(state);
-        assert_eq!(state[xy_idx(0, 0)], 0xd4);
-        assert_eq!(state[xy_idx(0, 1)], 0xbf);
-        assert_eq!(state[xy_idx(0, 2)], 0x5d);
-        assert_eq!(state[xy_idx(0, 3)], 0x30);
+        // let state = transform_state(state);
 
         let state = mix_column(state);
         print_state(&state);
@@ -369,11 +404,6 @@ mod tests {
         // let state: Vec<u8> = vec![0xD4, 0xBF, 0x5D, 0x30, 0xD4, 0xBF, 0x5D, 0x30, 0xD4, 0xBF, 0x5D, 0x30, 0xD4, 0xBF, 0x5D, 0x30];
         let state: Vec<u8> = vec![0x04, 0x66, 0x81, 0xe5, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,];
         // let state: Vec<u8> = vec![0xD4, 0xBF, 0x5D, 0x30];
-        let state = transform_state(state);
-        assert_eq!(state[xy_idx(0, 0)], 0x04);
-        assert_eq!(state[xy_idx(0, 1)], 0x66);
-        assert_eq!(state[xy_idx(0, 2)], 0x81);
-        assert_eq!(state[xy_idx(0, 3)], 0xe5);
 
         let state = inv_mix_column(state);
         print_state(&state);
@@ -384,11 +414,28 @@ mod tests {
         assert_eq!(state[xy_idx(0, 3)], 0x30);
     }
 
+    // #[test]
+    // pub fn test_transform_state() {
+    //     let state: Vec<u8> = vec![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+    //     let state = transform_state(state);
+    //     print_state(&state);
+    // }
+
     #[test]
-    pub fn test_transform_state() {
+    pub fn test_inv_s_row() {
         let state: Vec<u8> = vec![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
-        let state = transform_state(state);
+        let s2: Vec<u8> = vec![0x7a, 0xd5, 0xfd, 0xa7, 0x89, 0xef, 0x4e, 0x27, 0x2b, 0xca, 0x10, 0x0b, 0x3d, 0x9f, 0xf5, 0x9f];
+        let s2_r: Vec<u8> = vec![0x7a, 0x9f, 0x10, 0x27, 0x89, 0xd5, 0xf5, 0x0b, 0x2b, 0xef, 0xfd, 0x9f, 0x3d, 0xca, 0x4e, 0xa7];
+        let state = inv_shift_rows(state);
         print_state(&state);
+
+        print_state(&s2);
+        // let s2 = inv_shift_rows(transform_state(s2));
+        // print_state(&s2);
+        // let s2 = transform_state(s2);
+        // print_state(&s2);
+        print_state(&s2_r);
+        assert_eq!(s2, s2_r);
     }
 
     #[test]
@@ -399,74 +446,8 @@ mod tests {
     #[test]
     pub fn test_shift_row() {
         let state: Vec<u8> = vec![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
-        let state = transform_state(state);
+        // let state = transform_state(state);
         let state = shift_rows(state);
         print_state(&state);
     }
 }
-
-
-// pub fn mix_column(state: Vec<u8>) -> Vec<u8> {
-//     // t_state[0] = (
-//     //     t_state[xy_idx(0, 0)] * [t_state[xy_idx(0, 0)]]) 
-
-//     let mut t_state: Vec<u8> = vec![0;state.len()];
-//     // matrix pos tracker
-//     let mut m_pos = (0, 0);
-//     let mut s_pos: i32 = 0;
-//     let mut x = 0;
-//     let mut y = 0;
-
-//     while s_pos < state.len() as i32 {
-//         if inv_m_row == 3 {
-//             inv_m_row = 0;
-//         }
-//         // dbg!(&t_state, &state, x, y, s_pos, inv_m_row, m_pos.1);
-
-//         // dbg!(state[xy_idx(x, y)]);
-
-//         t_state[xy_idx(x, y)] =  
-//             (state[xy_idx(x, y)]      * tbl::m_mtrx(inv_m_row, m_pos.1)) ^ 
-//             (state[xy_idx(x, y + 1)]  * tbl::m_mtrx(inv_m_row, m_pos.1 + 1)) ^
-//             (state[xy_idx(x, y + 2)]  * tbl::m_mtrx(inv_m_row, m_pos.1 + 2)) ^ 
-//             (state[xy_idx(x, y + 3)]  * tbl::m_mtrx(inv_m_row, m_pos.1 + 3));
-//         inv_m_row += 1;
-
-//         dbg!(&t_state);
-
-//         t_state[xy_idx(x, y + 1)] = 
-//             (state[xy_idx(x, y)]     * tbl::m_mtrx(inv_m_row, m_pos.1)) ^ 
-//             (state[xy_idx(x, y + 1)] * tbl::m_mtrx(inv_m_row, m_pos.1 + 1)) ^
-//             (state[xy_idx(x, y + 2)] * tbl::m_mtrx(inv_m_row, m_pos.1 + 2)) ^ 
-//             (state[xy_idx(x, y + 3)] * tbl::m_mtrx(inv_m_row, m_pos.1 + 3));
-//         inv_m_row += 1;
-
-//         dbg!(&t_state);
-
-
-//         t_state[xy_idx(x, y + 2)] = 
-//             (state[xy_idx(x, y)]     * tbl::m_mtrx(inv_m_row, m_pos.1)) ^ 
-//             (state[xy_idx(x, y + 1)] * tbl::m_mtrx(inv_m_row, m_pos.1 + 1)) ^
-//             (state[xy_idx(x, y + 2)] * tbl::m_mtrx(inv_m_row, m_pos.1 + 2)) ^ 
-//             (state[xy_idx(x, y + 3)] * tbl::m_mtrx(inv_m_row, m_pos.1 + 3));
-//         inv_m_row += 1;
-        
-//         dbg!(&t_state);
-
-//         t_state[xy_idx(x, y + 3)] = 
-//             (state[xy_idx(x, y)]     * tbl::m_mtrx(inv_m_row, m_pos.1)) ^ 
-//             (state[xy_idx(x, y + 1)] * tbl::m_mtrx(inv_m_row, m_pos.1 + 1)) ^
-//             (state[xy_idx(x, y + 2)] * tbl::m_mtrx(inv_m_row, m_pos.1 + 2)) ^ 
-//             (state[xy_idx(x, y + 3)] * tbl::m_mtrx(inv_m_row, m_pos.1 + 3));
-        
-//         dbg!(&t_state);
-        
-//         s_pos += 4;
-//         x += 1;
-//         dbg!(s_pos);
-//         dbg!(x);
-//         // dbg!(&t_state);
-//     }
-
-//     t_state
-// }
