@@ -21,26 +21,6 @@ pub fn rot_word(mut word: u32) -> u32{
     word
 }
 
-// pub fn rot_word(mut word: Vec<u8>) -> Vec<u8> {
-//     let temp = word[0];
-//     for pos in 0..word.len() {
-//         if pos == 3 {
-//             break;
-//         }
-//         word[pos] = word[pos + 1];
-//     }
-//     word[3] = temp;
-    
-//     word
-// }
-
-// pub fn sub_word(mut val: Vec<u8>) -> u32 {
-//     for pos in 0..val.len() {
-//         val[pos] = tables::get_sbox(val[pos]);
-//     }
-
-//     val
-// }
 
 pub fn rcon(rounds: usize, key_size: usize) -> u32 {
     let lookup = (rounds/(key_size/4)) - 1;
@@ -129,7 +109,7 @@ mod tests {
         let val: u32 = 0x2a6c7605;
         let rotted: u32 = rot_word(val);
         assert_eq!(rotted, 0x6c76052a);
-        let subbed: u32 = aes::helper::byte_sub(rotted);
+        let subbed: u32 = aes::encrypt_funcs::byte_sub::byte_sub(rotted);
         assert_eq!(subbed, 0x50386be5);
         let rconned: u32 = rcon(8, 16);
         assert_eq!(rconned, 0x02000000);
@@ -156,7 +136,7 @@ mod tests {
     #[test]
     pub fn test_sub_word() {
         let val: u32 = 0x19;
-        let result = aes::helper::byte_sub(val);
+        let result = aes::encrypt_funcs::byte_sub::byte_sub(val);
         assert_eq!(result, 0xd4);
 
     }

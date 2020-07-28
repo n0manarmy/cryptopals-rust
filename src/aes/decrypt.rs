@@ -3,6 +3,8 @@ use crate::aes::helper;
 use crate::aes::tables;
 use crate::aes::test_vals::test_tables;
 use crate::aes::printer::print_state;
+use crate::aes::decrypt_funcs::{inv_mix_cols, inv_shift_rows};
+use crate::aes::encrypt_funcs::{key_sch, add_round_key};
 
 pub struct Decrypt {
     expanded_key: Vec<u8>,
@@ -39,13 +41,13 @@ impl Decrypt {
         print!("0 - ik_sch");
         // let ik_sch: Vec<u8> = helper::transform_state(
         //     helper::get_this_round_exp_key(self.rounds as usize, &self.expanded_key));
-        let ik_sch: Vec<u8> = helper::get_key_sch(self.rounds as usize, &self.expanded_key);
+        let ik_sch: Vec<u8> = key_sch::get(self.rounds as usize, &self.expanded_key);
         print_state(&ik_sch);
         assert_eq!(&ik_sch, &test_tables::inv_cipher_128((0,"ik_sch")));
         // let ik_sch = helper::transform_state(ik_sch);
 
         // print!("start add round key");
-        let mut state = helper::add_round_key(input, ik_sch);
+        let mut state = add_round_key::add(input, ik_sch);
         // print_state(&state);
 
         for x in 1..self.rounds {
@@ -55,7 +57,7 @@ impl Decrypt {
             assert_eq!(&state, &test_tables::inv_cipher_128((x,"istart")));
 
             print!("\n{} - is_row", x);
-            state = helper::inv_shift_rows(state);
+            state = inv_shift_rows::shift(state);
             print_state(&state);
             assert_eq!(&state, &test_tables::inv_cipher_128((x,"is_row")));
 
@@ -67,22 +69,22 @@ impl Decrypt {
             print!("\n{} - ik_sch", x);
             // let ik_sch: Vec<u8> = helper::transform_state(
             //     helper::get_this_round_exp_key((self.rounds - x) as usize, &self.expanded_key));
-            let ik_sch: Vec<u8> = helper::get_key_sch((self.rounds - x) as usize, &self.expanded_key);
+            let ik_sch: Vec<u8> = key_sch::get((self.rounds - x) as usize, &self.expanded_key);
             print_state(&ik_sch);
             assert_eq!(&state, &test_tables::inv_cipher_128((x,"ik_sch")));
 
             print!("\n{} - ik_add", x);
-            state = helper::add_round_key(state, ik_sch);
+            state = add_round_key::add(state, ik_sch);
             print_state(&state);
             assert_eq!(&state, &test_tables::inv_cipher_128((x,"ik_add")));
 
             print!("\n{} - im_col", x);
-            state = helper::inv_mix_column(state);
+            state = inv_mix_cols::mix(state);
             print_state(&state);            
         }
 
         print!("\n{} - inv is_row", 0);
-        state = helper::inv_shift_rows(state);
+        state = inv_shift_rows::shift(state);
         print_state(&state);
 
         print!("\n{} - is_box", 0);
@@ -91,11 +93,11 @@ impl Decrypt {
 
         print!("ik_sch");
         // let ik_sch: Vec<u8> = helper::transform_state(
-        let ik_sch: Vec<u8> = helper::get_key_sch(0, &self.expanded_key);
+        let ik_sch: Vec<u8> = key_sch::get(0, &self.expanded_key);
         print_state(&ik_sch);
         
         print!("\n{} - ik_add", 0);
-        state = helper::add_round_key(state, ik_sch);        
+        state = add_round_key::add(state, ik_sch);        
         print_state(&state);
 
         // helper::transform_state(output)

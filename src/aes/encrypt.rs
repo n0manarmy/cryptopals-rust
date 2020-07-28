@@ -2,6 +2,7 @@ use crate::aes::key_expander::expander;
 use crate::aes::helper;
 use crate::aes::tables;
 use crate::aes::printer::print_state;
+use crate::aes::encrypt_funcs::{add_round_key, byte_sub, key_sch, mix_columns, shift_rows};
 
 pub struct Encrypt {
     expanded_key: Vec<u8>,
@@ -36,12 +37,12 @@ impl Encrypt {
         let mut state = input;
 
         print!("0 - k_sch");
-        let ik_sch: Vec<u8> = helper::get_key_sch(0, &self.expanded_key);
+        let ik_sch: Vec<u8> = key_sch::get(0, &self.expanded_key);
         print_state(&ik_sch);
         // let ik_sch = helper::transform_state(ik_sch);
 
         // print!("start add round key");
-        state = helper::add_round_key(state, ik_sch);
+        state = add_round_key::add(state, ik_sch);
         // print_state(&state);
 
         for x in 1..self.rounds {
@@ -53,22 +54,22 @@ impl Encrypt {
             print_state(&state);
 
             print!("\n{} - s_row", x);
-            state = helper::shift_rows(state);
+            state = shift_rows::shift(state);
             print_state(&state);
 
             print!("\n{} - m_col", x);
-            state = helper::mix_column(state);
+            state = mix_columns::mix(state);
             print_state(&state);
 
             print!("\n{} - k_sch", x);
             // let ik_sch: Vec<u8> = helper::transform_state(
                 // helper::get_this_round_exp_key(x as usize, &self.expanded_key));
             
-            let ik_sch: Vec<u8> = helper::get_key_sch(x as usize, &self.expanded_key);
+            let ik_sch: Vec<u8> = key_sch::get(x as usize, &self.expanded_key);
             print_state(&ik_sch);
 
             print!("\n{} - k_add", x);
-            state = helper::add_round_key(state, ik_sch);
+            state = add_round_key::add(state, ik_sch);
             print_state(&state);
         }
 
@@ -78,15 +79,15 @@ impl Encrypt {
         print_state(&state);
 
         print!("\n{} - s_row", self.rounds);
-        state = helper::shift_rows(state);
+        state = shift_rows::shift(state);
         print_state(&state);
 
         print!("k_sch");
         // let ik_sch: Vec<u8> = helper::transform_state(helper::get_this_round_exp_key(self.rounds as usize, &self.expanded_key));
-        let ik_sch: Vec<u8> = helper::get_key_sch(self.rounds as usize, &self.expanded_key);
+        let ik_sch: Vec<u8> = key_sch::get(self.rounds as usize, &self.expanded_key);
         print_state(&ik_sch);
 
-        state = helper::add_round_key(state, ik_sch);        
+        state = add_round_key::add(state, ik_sch);        
 
         // helper::transform_state(output)  
         state
