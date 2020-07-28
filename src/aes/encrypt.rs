@@ -31,19 +31,12 @@ impl Encrypt {
         print!("0 -- input");
         print_state(&input);
 
-        // print!("transform input state");
-        // let mut state = helper::transform_state(input);
-        // print_state(&state);
         let mut state = input;
 
         print!("0 - k_sch");
         let ik_sch: Vec<u8> = key_sch::get(0, &self.expanded_key);
         print_state(&ik_sch);
-        // let ik_sch = helper::transform_state(ik_sch);
-
-        // print!("start add round key");
         state = add_round_key::add(state, ik_sch);
-        // print_state(&state);
 
         for x in 1..self.rounds {
             print!("\n{} - start", x);
@@ -68,9 +61,9 @@ impl Encrypt {
             let ik_sch: Vec<u8> = key_sch::get(x as usize, &self.expanded_key);
             print_state(&ik_sch);
 
-            print!("\n{} - k_add", x);
+            // print!("\n{} - k_add", x);
             state = add_round_key::add(state, ik_sch);
-            print_state(&state);
+            // print_state(&state);
         }
 
 
@@ -89,7 +82,6 @@ impl Encrypt {
 
         state = add_round_key::add(state, ik_sch);        
 
-        // helper::transform_state(output)  
         state
     }
 }
