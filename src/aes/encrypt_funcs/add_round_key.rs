@@ -1,14 +1,21 @@
+use crate::aes::helper::t_xy_idx;
 
-pub fn add(mut state: Vec<u8>, exp_key: Vec<u8>) -> Vec<u8>{
-    let iter = state.iter().zip(exp_key.iter());
-    state = iter.map(|(s, e)| s ^ e).collect::<Vec<u8>>();
-    // let mut x = 0;
-    // let mut y = 0;
-    // for _z in 0..state.len() {
-    //     state[xy_idx(x: i32, y: i32)]
-    // }
+pub fn add(mut state: Vec<u8>, cipher: Vec<u8>) -> Vec<u8>{
+    // let iter = state.iter().zip(exp_key.iter());
+    // state = iter.map(|(s, e)| s ^ e).collect::<Vec<u8>>();
+    let mut x = 0;
+    let mut y = 0;
+    let mut t_state: Vec<u8> = vec![0; state.len()];
+    for z in 0..state.len() {
+        if x == (state.len() / 4) as i32 {
+            x = 0;
+            y += 1;
+        }
+        t_state[z] = state[t_xy_idx(x, y)] ^ cipher[t_xy_idx(x, y)];
+        x += 1;
+    }
 
-    state
+    t_state
 }
 
 #[cfg(test)]

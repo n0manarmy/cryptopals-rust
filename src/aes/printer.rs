@@ -3,14 +3,15 @@ use crate::aes::helper::t_xy_idx;
 pub fn print_state(state: &Vec<u8>) {
     const VERT: u8 = 1;
     let mut horz = 0;
-    horz = VERT;
+    // horz = VERT;
     if horz == 0 {
         for x in 0..state.len() {
-            if x % 4 == 0 {
-                println!();
-                print!("{:02} - ", (x/4 + 1));
+            if x % 4== 0 {
+                // println!();
+                // print!("\t{:02} - ", (x/4 + 1));
+                print!(" ");
             }
-            print!("{:02x} ", state[x]);
+            print!("{:02x}", state[x]);
         }
     } else {
         println!();

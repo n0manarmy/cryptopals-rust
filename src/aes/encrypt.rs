@@ -28,7 +28,7 @@ impl Encrypt {
     }
 
     pub fn encrypt(self, input: Vec<u8>) -> Vec<u8> {
-        print!("0 -- input");
+        print!("0 - input");
         print_state(&input);
 
         let mut state = input;
