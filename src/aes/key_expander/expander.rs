@@ -208,12 +208,35 @@ mod tests {
     use super::*;
     use crate::aes::helper;
     use crate::hex;
+    use crate::aes::test_vals::test_tables;
 
     #[test]
     pub fn test_expand_128() {
         // let key: Vec<u8> = String::from("1234567890111213").bytes().collect();
         let key: Vec<u8> = vec![0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c];
         let expanded = expand(&key);
+        let mut pos = 0;
+        let mut k_sch_pos = 0;
+        while pos < (expanded.len() / 4) {
+            let mut this_k_sch: Vec<u8> = Vec::new();
+            for z in k_sch_pos..k_sch_pos+4 {
+                this_k_sch.push(expanded[z]);
+            }
+            print!("k_sch\t");
+            for t in this_k_sch.clone() {
+                print!("{:02x}", t);
+            }
+            println!();
+            let table_val = test_tables::cipher_key_test_128_bit_vals(pos);
+            print!("table\t");
+            for t in table_val.clone() {
+                print!("{:02x}", t);
+            }
+            println!();
+            assert_eq!(this_k_sch, table_val);
+            pos += 1;
+            k_sch_pos += 4;
+        }
         assert_eq!(expanded.len(), (44 * 4));
         
         print_state(&expanded);
