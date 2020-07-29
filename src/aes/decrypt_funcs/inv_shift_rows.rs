@@ -22,23 +22,23 @@ pub fn shift(state: Vec<u8>) -> Vec<u8> {
     // t_state[15] = state[12];
 
     t_state[0] = state[0];
-    t_state[1] = state[4];
-    t_state[2] = state[8];
-    t_state[3] = state[12];
+    t_state[1] = state[15];
+    t_state[2] = state[10];
+    t_state[3] = state[7];
 
-    t_state[4] = state[13];
+    t_state[4] = state[4];
     t_state[5] = state[1];
-    t_state[6] = state[5];
-    t_state[7] = state[9];
+    t_state[6] = state[14];
+    t_state[7] = state[11];
     
-    t_state[8] = state[10];
-    t_state[9] = state[14];
+    t_state[8] = state[8];
+    t_state[9] = state[5];
     t_state[10] = state[2];
-    t_state[11] = state[6];
+    t_state[11] = state[15];
     
-    t_state[12] = state[7];
-    t_state[13] = state[11];
-    t_state[14] = state[15];
+    t_state[12] = state[12];
+    t_state[13] = state[9];
+    t_state[14] = state[6];
     t_state[15] = state[3];
 
     t_state

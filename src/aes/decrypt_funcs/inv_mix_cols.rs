@@ -21,16 +21,16 @@ pub fn mix(state: Vec<u8>) -> Vec<u8> {
         t_state[xy_idx(x, y + 0)] =
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 0)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 0, inv_m_col)))) ^ 
+                    tbl::l_box(state[xy_idx(x, y + 0)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 0, inv_m_col)))) ^ 
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 1)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 1, inv_m_col)))) ^ 
+                    tbl::l_box(state[xy_idx(x, y + 1)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 1, inv_m_col)))) ^ 
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 2)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 2, inv_m_col)))) ^ 
+                    tbl::l_box(state[xy_idx(x, y + 2)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 2, inv_m_col)))) ^ 
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 3)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 3, inv_m_col))));
+                    tbl::l_box(state[xy_idx(x, y + 3)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 3, inv_m_col))));
         
         inv_m_col += 1;
         // println!("1 -- t_state: {:02x} at {},{}", t_state[xy_idx(x, y)], x, y);
@@ -39,16 +39,16 @@ pub fn mix(state: Vec<u8>) -> Vec<u8> {
         t_state[xy_idx(x, y + 1)] = 
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 0)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 0, inv_m_col)))) ^
+                    tbl::l_box(state[xy_idx(x, y + 0)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 0, inv_m_col)))) ^
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 1)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 1, inv_m_col)))) ^
+                    tbl::l_box(state[xy_idx(x, y + 1)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 1, inv_m_col)))) ^
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 2)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 2, inv_m_col)))) ^ 
+                    tbl::l_box(state[xy_idx(x, y + 2)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 2, inv_m_col)))) ^ 
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 3)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 3, inv_m_col))));
+                    tbl::l_box(state[xy_idx(x, y + 3)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 3, inv_m_col))));
         
         inv_m_col += 1;
         // println!("2 -- t_state: {:02x} at {},{}", t_state[xy_idx(x, y + 1)], x, y);
@@ -56,32 +56,32 @@ pub fn mix(state: Vec<u8>) -> Vec<u8> {
         t_state[xy_idx(x, y + 2)] = 
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 0)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 0, inv_m_col)))) ^
+                    tbl::l_box(state[xy_idx(x, y + 0)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 0, inv_m_col)))) ^
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 1)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 1, inv_m_col)))) ^
+                    tbl::l_box(state[xy_idx(x, y + 1)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 1, inv_m_col)))) ^
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 2)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 2, inv_m_col)))) ^ 
+                    tbl::l_box(state[xy_idx(x, y + 2)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 2, inv_m_col)))) ^ 
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 3)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 3, inv_m_col))));
+                    tbl::l_box(state[xy_idx(x, y + 3)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 3, inv_m_col))));
         inv_m_col += 1;
         // println!("3 -- t_state: {:02x} at {},{}", t_state[xy_idx(x, y + 2)], x, y);
 
         t_state[xy_idx(x, y + 3)] = 
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 0)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 0, inv_m_col)))) ^
+                    tbl::l_box(state[xy_idx(x, y + 0)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 0, inv_m_col)))) ^
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 1)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 1, inv_m_col)))) ^
+                    tbl::l_box(state[xy_idx(x, y + 1)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 1, inv_m_col)))) ^
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 2)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 2, inv_m_col)))) ^ 
+                    tbl::l_box(state[xy_idx(x, y + 2)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 2, inv_m_col)))) ^ 
             tbl::e_box(
                 l_box_overflow_check(
-                    tbl::l_box(state[t_xy_idx(x, y + 3)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 3, inv_m_col))));
+                    tbl::l_box(state[xy_idx(x, y + 3)]) , tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 3, inv_m_col))));
         
         // println!("4 -- t_state: {:02x} at {},{}", t_state[xy_idx(x, y + 3)], x, y);
         

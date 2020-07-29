@@ -30,27 +30,29 @@ impl Decrypt {
     }
 
     pub fn decrypt(self, input: Vec<u8>) -> Vec<u8> {
-        print!("0 -- iinput");
+        let mut x = 0;
+        print!("{} -- iinput",x);
         print_state(&input);
-        assert_eq!(&input, &test_tables::inv_cipher_128((0,"iinput")));
+        assert_eq!(&input, &test_tables::inv_cipher_128((x,"iinput")));
 
         // print!("transform input state");
         // let mut state = helper::transform_state(input);
         // print_state(&state);
 
-        print!("0 - ik_sch");
+        print!("{} - ik_sch", x);
         // let ik_sch: Vec<u8> = helper::transform_state(
         //     helper::get_this_round_exp_key(self.rounds as usize, &self.expanded_key));
         let ik_sch: Vec<u8> = key_sch::get(self.rounds as usize, &self.expanded_key);
         print_state(&ik_sch);
-        assert_eq!(&ik_sch, &test_tables::inv_cipher_128((0,"ik_sch")));
+        assert_eq!(&ik_sch, &test_tables::inv_cipher_128((x,"ik_sch")));
         // let ik_sch = helper::transform_state(ik_sch);
 
         // print!("start add round key");
         let mut state = add_round_key::add(input, ik_sch);
         // print_state(&state);
 
-        for x in 1..self.rounds {
+        while x < (self.rounds - 1) {
+            x += 1;
             print!("\n{} - istart", x);
             // state = helper::transform_state(state);
             print_state(&state);
@@ -71,7 +73,7 @@ impl Decrypt {
             //     helper::get_this_round_exp_key((self.rounds - x) as usize, &self.expanded_key));
             let ik_sch: Vec<u8> = key_sch::get((self.rounds - x) as usize, &self.expanded_key);
             print_state(&ik_sch);
-            assert_eq!(&state, &test_tables::inv_cipher_128((x,"ik_sch")));
+            assert_eq!(&ik_sch, &test_tables::inv_cipher_128((x,"ik_sch")));
 
             print!("\n{} - ik_add", x);
             state = add_round_key::add(state, ik_sch);
@@ -82,12 +84,13 @@ impl Decrypt {
             state = inv_mix_cols::mix(state);
             print_state(&state);            
         }
-
-        print!("\n{} - inv is_row", 0);
+        
+        x += 1;
+        print!("\n{} - inv is_row", x);
         state = inv_shift_rows::shift(state);
         print_state(&state);
 
-        print!("\n{} - is_box", 0);
+        print!("\n{} - is_box", x);
         state = state.iter().map(|x| tables::inv_s_box(*x)).collect();
         print_state(&state);
 
