@@ -1,6 +1,6 @@
 use crate::aes::helper::t_xy_idx;
 
-pub fn add(mut state: Vec<u8>, cipher: Vec<u8>) -> Vec<u8>{
+pub fn xor(mut state: Vec<u8>, cipher: Vec<u8>) -> Vec<u8>{
     let iter = state.iter().zip(cipher.iter());
     state = iter.map(|(s, e)| s ^ e).collect::<Vec<u8>>();
 
@@ -43,7 +43,7 @@ mod tests {
         println!("add round key");
         let this_exp_key = key_sch::get(0, &expanded);
         // let this_exp_key = transform_state(this_exp_key);
-        let state = add(input, this_exp_key);
+        let state = xor(input, this_exp_key);
         print_state(&state);
         
     }

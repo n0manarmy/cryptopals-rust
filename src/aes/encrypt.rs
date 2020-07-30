@@ -41,7 +41,7 @@ impl Encrypt {
         let ik_sch: Vec<u8> = key_sch::get(0, &self.expanded_key);
         print_state(&ik_sch);
         assert_eq!(&ik_sch, &cipher_128((x, "k_sch")));
-        state = add_round_key::add(state, ik_sch);
+        state = add_round_key::xor(state, ik_sch);
 
         while x < (self.rounds - 1) {
             x += 1;
@@ -73,7 +73,7 @@ impl Encrypt {
             assert_eq!(&ik_sch, &cipher_128((x, "k_sch")));
 
             // print!("\n{} - k_add", x);
-            state = add_round_key::add(state, ik_sch);
+            state = add_round_key::xor(state, ik_sch);
             // print_state(&state);
         }
 
@@ -94,7 +94,7 @@ impl Encrypt {
         print_state(&ik_sch);
         assert_eq!(&ik_sch, &cipher_128((x, "k_sch")));
 
-        state = add_round_key::add(state, ik_sch);        
+        state = add_round_key::xor(state, ik_sch);        
 
         state
     }

@@ -1,5 +1,4 @@
 use crate::aes::key_expander::expander;
-use crate::aes::helper;
 use crate::aes::tables;
 use crate::aes::test_vals::test_tables;
 use crate::aes::printer::print_state;
@@ -48,7 +47,7 @@ impl Decrypt {
         // let ik_sch = helper::transform_state(ik_sch);
 
         // print!("start add round key");
-        let mut state = add_round_key::add(input, ik_sch);
+        let mut state = add_round_key::xor(input, ik_sch);
         // print_state(&state);
 
         while x < (self.rounds - 1) {
@@ -76,13 +75,13 @@ impl Decrypt {
             assert_eq!(&ik_sch, &test_tables::inv_cipher_128((x,"ik_sch")));
 
             print!("\n{} - ik_add", x);
-            state = add_round_key::add(state, ik_sch);
+            state = add_round_key::xor(state, ik_sch);
             print_state(&state);
             assert_eq!(&state, &test_tables::inv_cipher_128((x,"ik_add")));
 
-            print!("\n{} - im_col", x);
+            // print!("\n{} - im_col", x);
             state = inv_mix_cols::mix(state);
-            print_state(&state);            
+            // print_state(&state);            
         }
         
         x += 1;
@@ -100,7 +99,7 @@ impl Decrypt {
         print_state(&ik_sch);
         
         print!("\n{} - ik_add", 0);
-        state = add_round_key::add(state, ik_sch);        
+        state = add_round_key::xor(state, ik_sch);        
         print_state(&state);
 
         // helper::transform_state(output)
@@ -137,7 +136,7 @@ mod tests {
         for i in input.clone() {
             print!("{:02x}", i);
         }
-        println!("build ciper");
+        println!("build cipher");
         let cipher = "000102030405060708090a0b0c0d0e0f";
         let cipher: Vec<u8> = hex::encoders::str_to_hex_u8_buf(cipher);
         assert_eq!(cipher.len(), 16);
