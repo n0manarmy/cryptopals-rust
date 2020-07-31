@@ -68,8 +68,6 @@ impl Decrypt {
             assert_eq!(&state, &test_tables::inv_cipher_128((x,"is_box")));
 
             print!("\n{} - ik_sch", x);
-            // let ik_sch: Vec<u8> = helper::transform_state(
-            //     helper::get_this_round_exp_key((self.rounds - x) as usize, &self.expanded_key));
             let ik_sch: Vec<u8> = key_sch::get((self.rounds - x) as usize, &self.expanded_key);
             print_state(&ik_sch);
             assert_eq!(&ik_sch, &test_tables::inv_cipher_128((x,"ik_sch")));
@@ -79,9 +77,9 @@ impl Decrypt {
             print_state(&state);
             assert_eq!(&state, &test_tables::inv_cipher_128((x,"ik_add")));
 
-            // print!("\n{} - im_col", x);
+            print!("\n{} - im_col", x);
             state = inv_mix_cols::mix(state);
-            // print_state(&state);            
+            print_state(&state);            
         }
         
         x += 1;

@@ -12,12 +12,17 @@ pub fn mix(state: Vec<u8>) -> Vec<u8> {
     let mut y = 0;
 
     while s_pos < state.len() as i32 {
+
         let t1 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 0, y)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 0, inv_m_col)));
         let t2 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 1, y)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 1, inv_m_col)));
         let t3 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 2, y)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 2, inv_m_col)));
         let t4 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 3, y)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 3, inv_m_col)));
 
+        println!("t1: {:02x} t2: {:02x} t3: {:02x} t4: {:02x} ", t1, t2, t3, t4);
+        println!("t1: {:02x} t2: {:02x} t3: {:02x} t4: {:02x} ", tbl::e_box(t1), tbl::e_box(t2), tbl::e_box(t3), tbl::e_box(t4));
         t_state[xy_idx(x, y)] = tbl::e_box(t1) ^ tbl::e_box(t2) ^ tbl::e_box(t3) ^ tbl::e_box(t4);
+        println!("{:02x}" , t_state[xy_idx(x + 1, y)]);
+
 
         inv_m_col += 1;
 
@@ -26,7 +31,10 @@ pub fn mix(state: Vec<u8>) -> Vec<u8> {
         let t3 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 2, y)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 2, inv_m_col)));
         let t4 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 3, y)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 3, inv_m_col)));
 
+        println!("t1: {:02x} t2: {:02x} t3: {:02x} t4: {:02x} ", t1, t2, t3, t4);
+        println!("t1: {:02x} t2: {:02x} t3: {:02x} t4: {:02x} ", tbl::e_box(t1), tbl::e_box(t2), tbl::e_box(t3), tbl::e_box(t4));
         t_state[xy_idx(x + 1, y)] = tbl::e_box(t1) ^ tbl::e_box(t2) ^ tbl::e_box(t3) ^ tbl::e_box(t4);
+        println!("{:02x}" , t_state[xy_idx(x + 1, y)]);
         
         inv_m_col += 1;
 
@@ -35,7 +43,10 @@ pub fn mix(state: Vec<u8>) -> Vec<u8> {
         let t3 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 2, y)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 2, inv_m_col)));
         let t4 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 3, y)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 3, inv_m_col)));
 
+        println!("t1: {:02x} t2: {:02x} t3: {:02x} t4: {:02x} ", t1, t2, t3, t4);
+        println!("t1: {:02x} t2: {:02x} t3: {:02x} t4: {:02x} ", tbl::e_box(t1), tbl::e_box(t2), tbl::e_box(t3), tbl::e_box(t4));
         t_state[xy_idx(x + 2, y)] = tbl::e_box(t1) ^ tbl::e_box(t2) ^ tbl::e_box(t3) ^ tbl::e_box(t4);
+        println!("{:02x}" , t_state[xy_idx(x + 2, y)]);
         
         inv_m_col += 1;
 
@@ -44,7 +55,10 @@ pub fn mix(state: Vec<u8>) -> Vec<u8> {
         let t3 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 2, y)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 2, inv_m_col)));
         let t4 = l_box_overflow_check(tbl::l_box(state[xy_idx(x + 3, y)]), tbl::l_box(tbl::inv_m_mtrx(inv_m_row + 3, inv_m_col)));
 
+        println!("t1: {:02x} t2: {:02x} t3: {:02x} t4: {:02x} ", t1, t2, t3, t4);
+        println!("t1: {:02x} t2: {:02x} t3: {:02x} t4: {:02x} ", tbl::e_box(t1), tbl::e_box(t2), tbl::e_box(t3), tbl::e_box(t4));
         t_state[xy_idx(x + 3, y)] = tbl::e_box(t1) ^ tbl::e_box(t2) ^ tbl::e_box(t3) ^ tbl::e_box(t4);
+        println!("{:02x}" , t_state[xy_idx(x + 3, y)]);
         
         inv_m_col = 0;
         
@@ -75,5 +89,14 @@ mod tests {
         assert_eq!(state[xy_idx(0, 1)], 0xbf);
         assert_eq!(state[xy_idx(0, 2)], 0x5d);
         assert_eq!(state[xy_idx(0, 3)], 0x30);
+    }
+
+    #[test]
+    pub fn test_round_5_col_mix() {
+        let state: Vec<u8> = vec![0x98, 0x16, 0xee, 0x74, 0x00, 0xf8, 0x7f, 0x55, 0x6b, 0x2c, 0x04, 0x9c, 0x8e, 0x5a, 0xd0, 0x36];
+        let result: Vec<u8> = vec![0xe8, 0xda, 0xb6, 0x90, 0x14, 0x77, 0xd4, 0x65, 0x3f, 0xf7, 0xf5, 0xe2, 0xe7, 0x47, 0xdd, 0x4f];
+        let state = mix(state);
+        print_state(&state);
+        assert_eq!(state, result);
     }
 }

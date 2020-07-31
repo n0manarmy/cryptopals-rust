@@ -45,7 +45,7 @@ pub fn str_to_hex_u8_buf(buf: &str) -> Vec<u8> {
 }
 
 pub fn translate_char_to_hex_val(x: char) -> usize {
-    match x {
+    match x.to_ascii_lowercase() {
         '0' => 0,
         '1' => 1,
         '2' => 2,
