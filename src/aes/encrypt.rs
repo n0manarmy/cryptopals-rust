@@ -60,7 +60,8 @@ impl Encrypt {
             assert_eq!(&state, &cipher_128((x, "s_row")));
 
             print!("\n{} - m_col", x);
-            state = mix_columns::mix(state);
+            // state = mix_columns::table_mix(state);
+            state = mix_columns::table_mix(state);
             print_state(&state);
             assert_eq!(&state, &cipher_128((x, "m_col")));
 

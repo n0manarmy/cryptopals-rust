@@ -78,7 +78,7 @@ impl Decrypt {
             assert_eq!(&state, &test_tables::inv_cipher_128((x,"ik_add")));
 
             print!("\n{} - im_col", x);
-            state = inv_mix_cols::mix(state);
+            state = inv_mix_cols::mixV2(state);
             print_state(&state);            
         }
         

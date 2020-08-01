@@ -117,27 +117,25 @@ pub fn s_box(val: u8) -> u8 {
     s_box[xy_idx.0][xy_idx.1]
 }
 
-pub fn inv_m_mtrx(x: i32, y: i32) -> u8 {
-    let table: Vec<u8> = vec![
-        0x0E, 0x0B, 0x0D, 0x09,
-        0x09, 0x0E, 0x0B, 0x0D,
-        0x0D, 0x09, 0x0E, 0x0B,
-        0x0B, 0x0D, 0x09, 0x0E
+pub fn inv_m_mtrx(r: usize, c: usize) -> u8 {
+    let table: [[u8; 4]; 4] = [
+        [0x0E, 0x0B, 0x0D, 0x09],
+        [0x09, 0x0E, 0x0B, 0x0D],
+        [0x0D, 0x09, 0x0E, 0x0B],
+        [0x0B, 0x0D, 0x09, 0x0E],
     ];        
-    let result = table[helper::xy_idx(x, y)];
-    // println!("m_mtrx result: {}", result);
 
-    result
+    table[r][c]
 }
 
-pub fn m_mtrx(x: i32, y: i32) -> u8 {
-    let table: Vec<u8> = vec![
-        2, 3, 1, 1, 
-        1, 2, 3, 1, 
-        1, 1, 2, 3, 
-        3, 1, 1, 2];
-    let result = table[helper::xy_idx(x, y)];
-    // println!("m_mtrx result: {}", result);
+pub fn m_mtrx(x: usize, y: usize) -> u8 {
+    let table: [[u8; 4]; 4] = [
+        [0x2, 0x3, 0x1, 0x1],
+        [0x1, 0x2, 0x3, 0x1], 
+        [0x1, 0x1, 0x2, 0x3], 
+        [0x3, 0x1, 0x1, 0x2],
+    ];
+    let result = table[y][x];
 
     result
 }
@@ -159,6 +157,15 @@ fn box_xy_idx(val: u8) -> (usize, usize) {
 mod tests {
 
     use super::*;
+
+    #[test]
+    pub fn test_get_m_mtrx() {
+        assert_eq!(m_mtrx(0, 0), 2);
+        assert_eq!(m_mtrx(1, 0), 3);
+        assert_eq!(m_mtrx(2, 0), 1);
+        assert_eq!(m_mtrx(3, 0), 1);
+        assert_eq!(m_mtrx(2, 2), 2);
+    }
 
     #[test]
     pub fn test_s_box() {

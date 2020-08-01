@@ -27,8 +27,8 @@ pub fn t_xy_idx(x: i32, y: i32) -> usize {
 
 
 
-pub fn l_box_overflow_check(x: u8, y: u8) -> u8 {
-    println!("{:02} {:02} {:02x} {:02x}", x, y, x, y);
+pub fn overflow_check(x: u8, y: u8) -> u8 {
+    // println!("{:02} {:02} {:02x} {:02x}", x, y, x, y);
     match x.checked_add(y) {
         Some(val) => return val,
         None => return ((x as u32 + y as u32) - 0xff) as u8,
