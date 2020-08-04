@@ -18,7 +18,7 @@ pub fn decode_str(val: &str) -> String {
         if buf_size == 4 {
             let bytes = decode_match(byte_buf, buf_size);
             // println!("inside: {}", bytes);
-            decoded.push_str(&bytes);
+            decoded.push_str(&bytes.iter().map(|x| *x as char).collect::<String>());
             buf_size = 0;
         }
         byte_buf <<= 6;
@@ -27,20 +27,56 @@ pub fn decode_str(val: &str) -> String {
 
     if padding == 2 {
         let bytes = decode_match(byte_buf >> 10, buf_size);
-        decoded.push_str(&bytes);
+            decoded.push_str(&bytes.iter().map(|x| *x as char).collect::<String>());
     }
     
     if padding == 1 {
         let bytes = decode_match(byte_buf >> 8, buf_size);
-        decoded.push_str(&bytes);
+            decoded.push_str(&bytes.iter().map(|x| *x as char).collect::<String>());
     }
 
     decoded
 }
 
+pub fn decode_str_to_u8(val: &str) -> Vec<u8> {
+    let mut decoded: Vec<u8> = Vec::new();
+    let mut byte_buf: u32 = 0;
+    let mut buf_size: usize = 0;
 
-fn decode_match(byte_buf: u32, mut buf_size: usize) -> String {
-    let mut str_buff: String = String::new();
+    let padding = val.len() - val.trim_end_matches('=').len();
+    let val = val.trim_end_matches('=');
+
+    //cw==
+    for c in val.chars() {
+        buf_size += 1;
+        // dbg!(c);
+        byte_buf |= translators::from_base64(c) as u32;
+        // println!("1: {:b} buf_size: {}", byte_buf, buf_size);
+        if buf_size == 4 {
+            let mut bytes = decode_match(byte_buf, buf_size);
+            // println!("inside: {}", bytes);
+            decoded.append(&mut bytes);
+            buf_size = 0;
+        }
+        byte_buf <<= 6;
+    }
+    // println!("2: {:b} buf_size: {}", byte_buf, buf_size);
+
+    if padding == 2 {
+        let mut bytes = decode_match(byte_buf >> 10, buf_size);
+        decoded.append(&mut bytes);
+    }
+    
+    if padding == 1 {
+        let mut bytes = decode_match(byte_buf >> 8, buf_size);
+        decoded.append(&mut bytes);
+    }
+
+    decoded
+}
+
+fn decode_match(byte_buf: u32, mut buf_size: usize) -> Vec::<u8> {
+    let mut buf: Vec<u8> = Vec::new();
     // println!("decode_match -- byte_buf: {:b} buf_size: {}", byte_buf, buf_size);
     while buf_size > 0 {
         let byte = match buf_size {
@@ -53,10 +89,10 @@ fn decode_match(byte_buf: u32, mut buf_size: usize) -> String {
 
         buf_size -= 1;
         // println!("byte after match {:b} {}", byte, byte);
-        str_buff.push(byte as char);
+        buf.push(byte);
         // dbg!(&str_buff);
     }
-    str_buff
+    buf
 }
 
 #[cfg(test)]
