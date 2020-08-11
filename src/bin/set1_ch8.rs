@@ -1,7 +1,6 @@
 extern crate cryptopals_lib;
 extern crate rusty_aes;
 use std::cmp::Ordering;
-use crate::cryptopals_lib::base64;
 use crate::cryptopals_lib::utils::file_io_utils;
 use crate::rusty_aes::decrypt::Decrypt;
 use crate::cryptopals_lib::hex;
@@ -16,7 +15,7 @@ pub fn main() {
         t_input.push(hex::encoders::str_to_hex_u8_buf(&i));
     }
 
-    let key = "YELLOW SUBMARINE".as_bytes().to_vec();
+    // let key = "YELLOW SUBMARINE".as_bytes().to_vec();
     
     //instantiate our aes decryptor
     // for (i, t) in t_input.iter().enumerate() {
