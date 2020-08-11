@@ -22,7 +22,7 @@ pub fn main() {
     let mut xord_buff: Vec<xor::helpers::XorResult> = Vec::new();
 
     //read file into buffer
-    let enc_str = file_io_utils::read_file_by_lines_to_vec(test_file);
+    let enc_str = file_io_utils::read_file_by_lines_to_vec_str(test_file);
 
     for (i, line) in enc_str.iter().enumerate() {
         //decode hex values to bytes

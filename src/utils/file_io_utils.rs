@@ -54,7 +54,7 @@ pub fn read_file_by_lines_to_str(f: &str) -> String {
 
 }
 
-pub fn read_file_by_lines_to_vec(f: &str) -> Vec<String> {
+pub fn read_file_by_lines_to_vec_str(f: &str) -> Vec<String> {
     let f_reader = match std::fs::File::open(std::path::Path::new(f)) {
         Ok(f) => f,
         Err(why) => panic!(why.to_string()),
