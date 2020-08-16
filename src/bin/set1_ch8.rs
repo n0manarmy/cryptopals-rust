@@ -32,14 +32,6 @@ pub fn main() {
             dbg!(c);
         }
     }
-
-
-    // let decrypt: Decrypt = Decrypt::new(key);
-
-    // for t in t_input {
-    //     process(t, &decrypt);
-    // }
-
 }
 
 #[derive(Debug)]
@@ -101,37 +93,4 @@ fn pattern_match(line: &Vec<u8>, check_size: usize) -> usize {
     }
 
     count
-}
-
-fn process(input: Vec<u8>, decrypt: &Decrypt) {
-    let mut buf: Vec<u8> = Vec::new();
-    let buf_len = 16;
-    println!();
-    let mut count = 0;
-    while count < input.len() {
-        if count + buf_len >= input.len() {
-            // buf = enc_str[count..(enc_str.len() - count)].to_vec();
-            let mut slice = input[count..count + (input.len() - count)].to_vec();
-            let padding = buf_len - slice.len() ;
-            for _z in 0..padding {
-                slice.push(0x80);
-            }
-            buf.append(&mut decrypt.decrypt(slice));
-        } 
-        else {
-            let slice = input[count..(count + buf_len)].to_vec();
-            assert_eq!(slice.len(), buf_len);
-            buf.append(&mut decrypt.decrypt(slice));
-        }
-        count += buf_len;
-    }
-    for b in buf {
-        print!("{}", b as char);
-    }
-    println!();
-}
-
-#[cfg(test)]
-mod tests {
-
 }

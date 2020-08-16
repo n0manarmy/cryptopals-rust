@@ -22,6 +22,7 @@ the end of the block. For instance,
 
 fn main() {
     let key: Vec<u8> = "YELLOW SUBMARINE".chars().map(|x| x as u8).collect();
-    let pad_test: Vec<u8> = "YELLOW SUBMARINE\x04\x04\x04\x04".chars().map(|x| x as u8).collect();
+    let mut pad_test: Vec<u8> = "YELLOW SUBMARINE".chars().map(|x| x as u8).collect();
+    pad_test.append(&mut vec![0x80, 0x80, 0x80, 0x80]);
     assert_eq!(padder::pad(key, 20), pad_test);
 }
