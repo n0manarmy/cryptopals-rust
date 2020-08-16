@@ -17,5 +17,9 @@ This is a collection of code from my efforts doing the https://cryptopals.com ch
 * Challenge 7
 * Challenge 8
 
+### Set 2
+* Challenge 10
+
 ## Current
-* Set 2 Challenge 1
+
+* Set 2 Challenge 11
