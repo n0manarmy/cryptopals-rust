@@ -1,6 +1,5 @@
 extern crate cryptopals_lib;
 extern crate rusty_aes;
-use crate::rusty_aes::aes_mode::AesMode;
 use crate::cryptopals_lib::base64;
 use crate::cryptopals_lib::utils::file_io_utils;
 use crate::rusty_aes::decrypt::Decrypt;
@@ -18,8 +17,8 @@ pub fn main() {
     let key = "YELLOW SUBMARINE".as_bytes().to_vec();
     
     //instantiate our aes decryptor
-    let decrypt: Decrypt = Decrypt::new(key, AesMode::ECB);
-    let results = decrypt.start_ecb(input);
+    let decrypt: Decrypt = Decrypt::ecb(key);
+    let results = decrypt.decrypt(input);
     
     // let mut buf: Vec<u8> = Vec::new();
     // let buf_len = 16;

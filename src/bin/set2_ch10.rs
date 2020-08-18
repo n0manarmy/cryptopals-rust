@@ -33,8 +33,8 @@ fn main() {
     let iv = "0000000000000000".as_bytes().to_vec();
     let input = file_io_utils::read_file_by_lines_to_str(file);
     let input = decoder::decode_str_to_u8(&input);
-    let decryptor: Decrypt = Decrypt::new(key, AesMode::CBC);
-    let results = decryptor.start_cbc(input, iv);
+    let decryptor: Decrypt = Decrypt::cbc(key, iv);
+    let results = decryptor.decrypt(input);
 
     for r in results {
         print!("{}", r as char);
